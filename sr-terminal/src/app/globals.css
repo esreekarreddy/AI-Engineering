@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  /* Aerospace Theme - Light (Technical Manual) */
+  --bg-primary: #f4f5f7; /* Technical White */
+  --bg-secondary: #e6e8eb; /* Component background */
+  --bg-tertiary: #d1d5db; /* Borders/Separators */
+
+  --text-primary: #1f2937; /* Ink Black */
+  --text-secondary: #4b5563; /* Muted text */
+  --text-mono: #000000; /* Strict Mono */
+
+  --accent-orange: #ff5a1f; /* Safety Orange (Primary Action) */
+  --accent-blue: #0066cc; /* Signal Blue (Selection/Focus) */
+  --accent-green: #10b981; /* Success */
+  --accent-red: #ef4444; /* Error/Alert */
+
+  /* Terminal specific */
+  --terminal-bg: #0d0e11; /* Deep Space */
+  --terminal-fg: #e6e8eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Aerospace Theme - Dark (cockpit night mode) */
+    --bg-primary: #0d0e11; /* Deep Slate */
+    --bg-secondary: #16181d; /* Panel Background */
+    --bg-tertiary: #2d3139; /* Borders */
+
+    --text-primary: #e6e8eb; /* Text White */
+    --text-secondary: #9ca3af; /* Muted */
+    --text-mono: #e5e7eb;
+
+    /* Accents remain vibrant */
+    --accent-orange: #ff6b35;
+    --accent-blue: #3b82f6;
+  }
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), sans-serif;
+  overflow: hidden; /* App-like feel */
+}
+
+/* Scrollbar styling for that industrial feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 0px; /* Square technical look */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
