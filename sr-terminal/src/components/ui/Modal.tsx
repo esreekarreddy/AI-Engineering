@@ -1,7 +1,7 @@
 import { useModalStore } from '@/lib/modal-store';
 import { X, Check } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
+
 
 export default function ModalRenderer() {
   const { isOpen, type, options, closeModal } = useModalStore();
@@ -10,8 +10,11 @@ export default function ModalRenderer() {
 
   useEffect(() => {
     if (isOpen && type === 'prompt') {
-      setInputValue(options.defaultValue || '');
-      setTimeout(() => inputRef.current?.focus(), 100);
+      // Use requestAnimationFrame for safer focus timing and to avoid synchronous setState warning
+      requestAnimationFrame(() => {
+          setInputValue(options.defaultValue || '');
+          inputRef.current?.focus();
+      });
     }
   }, [isOpen, type, options.defaultValue]);
 

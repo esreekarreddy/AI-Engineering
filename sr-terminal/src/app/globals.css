@@ -20,23 +20,6 @@
   --terminal-fg: #e6e8eb;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Aerospace Theme - Dark (cockpit night mode) */
-    --bg-primary: #0d0e11; /* Deep Slate */
-    --bg-secondary: #16181d; /* Panel Background */
-    --bg-tertiary: #2d3139; /* Borders */
-
-    --text-primary: #e6e8eb; /* Text White */
-    --text-secondary: #9ca3af; /* Muted */
-    --text-mono: #e5e7eb;
-
-    /* Accents remain vibrant */
-    --accent-orange: #ff6b35;
-    --accent-blue: #3b82f6;
-  }
-}
-
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);

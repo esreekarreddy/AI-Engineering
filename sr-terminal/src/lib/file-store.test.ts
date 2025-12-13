@@ -52,7 +52,7 @@ describe('FileStore', () => {
     });
 
     it('should clear dirty state on save', () => {
-        const { updateFileContent, saveFile } = useFileStore.getState();
+        const { updateFileContent } = useFileStore.getState();
         const filePath = '/src/save-test.js';
 
         // Mock WebContainer dependency? 

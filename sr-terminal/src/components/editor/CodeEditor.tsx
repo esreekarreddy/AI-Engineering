@@ -1,24 +1,41 @@
 import Editor, { OnMount } from '@monaco-editor/react';
 import { useFileStore } from '@/lib/file-store';
+import { useEditorStore } from '@/lib/editor-store';
 
 export default function CodeEditor() {
   const { selectedFile, fileContents, updateFileContent, saveFile, isDirty } = useFileStore();
+  const { setCursorPosition, setSelection } = useEditorStore();
 
   // When selectedFile changes, we want to reset the editor content.
   // Using key={selectedFile} on the Editor component is the cleanest way to force a reset.
   
   // Keyboard shortcut to save
   const handleEditorMount: OnMount = (editor, monaco) => {
+    // Add Save Command
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
       if (selectedFile) {
         saveFile(selectedFile);
       }
     });
+
+    // Track Cursor
+    editor.onDidChangeCursorPosition((e) => {
+      setCursorPosition({
+        lineNumber: e.position.lineNumber,
+        column: e.position.column
+      });
+    });
+
+    // Track Selection
+    editor.onDidChangeCursorSelection((e) => {
+      const selection = editor.getModel()?.getValueInRange(e.selection);
+      setSelection(selection || null);
+    });
   };
 
   if (!selectedFile) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-[var(--text-secondary)] bg-[var(--bg-primary)]">
+      <div className="h-full w-full flex items-center justify-center text-[var(--text-secondary)] bg-[#1e1e1e]">
         <div className="text-center">
             <p className="mb-2">⌘</p>
             <p className="text-sm">Select a file to edit</p>

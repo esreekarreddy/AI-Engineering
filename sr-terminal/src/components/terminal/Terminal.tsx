@@ -69,6 +69,7 @@ export default function TerminalComponent({ onTerminalReady }: TerminalComponent
       resizeObserver.disconnect();
       terminal.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

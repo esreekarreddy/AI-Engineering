@@ -1,5 +1,3 @@
-import { CreateMLCEngine, MLCEngine, InitProgressCallback } from "@mlc-ai/web-llm";
-
 export type ModelStatus = "idle" | "loading" | "ready" | "generating" | "error";
 
 export interface AIState {
@@ -10,6 +8,7 @@ export interface AIState {
 
 class AIEngine {
   private static instance: AIEngine;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private engine: any | null = null;
   private currentModel = "Phi-3-mini-4k-instruct-q4f16_1-MLC";
   

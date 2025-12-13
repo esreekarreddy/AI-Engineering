@@ -15,15 +15,17 @@ interface FileNode {
 interface FileNodeProps {
   node: FileNode;
   level: number;
+  onContextMenu: (e: React.MouseEvent, path: string, type: 'file' | 'directory') => void;
 }
 
-function FileTreeNode({ node, level }: FileNodeProps) {
+function FileTreeNode({ node, level, onContextMenu }: FileNodeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { selectFile, selectedFile } = useFileStore();
   
   const isSelected = selectedFile === node.path;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (node.kind === 'directory') {
       setIsOpen(!isOpen);
     } else {
@@ -39,11 +41,14 @@ function FileTreeNode({ node, level }: FileNodeProps) {
     <div>
       <div 
         className={clsx(
-            "flex items-center gap-1.5 py-1 px-2 cursor-pointer hover:bg-[var(--bg-tertiary)] select-none transition-colors",
-            isSelected && "bg-[var(--accent-blue)] text-white hover:bg-[var(--accent-blue)]"
+            "flex items-center gap-1.5 py-1 px-2 cursor-pointer select-none transition-colors",
+            // FIXED: Better hover contrast - sets text to white/primary when hovering on non-selected items
+            !isSelected && "text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]",
+            isSelected && "bg-[var(--accent-blue)] text-white"
         )}
         style={{ paddingLeft: `${level * 12 + 12}px` }}
         onClick={handleClick}
+        onContextMenu={(e) => onContextMenu(e, node.path, node.kind)}
       >
         <Icon size={14} className={clsx("opacity-70", isSelected && "opacity-100")} />
         <span className="truncate">{node.name}</span>
@@ -52,7 +57,7 @@ function FileTreeNode({ node, level }: FileNodeProps) {
       {isOpen && node.children && (
         <div>
           {node.children.map((child) => (
-            <FileTreeNode key={child.path} node={child} level={level + 1} />
+            <FileTreeNode key={child.path} node={child} level={level + 1} onContextMenu={onContextMenu} />
           ))}
         </div>
       )}
@@ -61,10 +66,24 @@ function FileTreeNode({ node, level }: FileNodeProps) {
 }
 
 import { useModalStore } from '@/lib/modal-store';
+import { useRef, useEffect } from 'react';
 
 export default function FileTree() {
-  const { fileTree, refreshFileTree, createFile, deleteFile, selectedFile, fileContents } = useFileStore();
+  const { fileTree, createFile, deleteFile, renameFile, selectedFile, fileContents, selectFile } = useFileStore();
   const { openModal } = useModalStore();
+  
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; path: string; type: 'file' | 'directory' } | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const handleNewFile = async () => {
     openModal('prompt', {
@@ -77,15 +96,32 @@ export default function FileTree() {
     });
   };
 
-  const handleDelete = async () => {
-    if (!selectedFile) return;
+  const handleDelete = async (path: string | null = null) => {
+    const target = path || selectedFile;
+    if (!target) return;
+    
     openModal('confirm', {
-      title: 'Delete File',
-      message: `Are you sure you want to permanently delete "${selectedFile}"? This action cannot be undone.`,
+      title: 'Delete Item',
+      message: `Are you sure you want to permanently delete "${target}"?`,
       onConfirm: async () => {
-        await deleteFile(selectedFile);
+        await deleteFile(target);
       }
     });
+  };
+  
+  const handleRename = async (path: string) => {
+      const currentName = path.split('/').pop() || '';
+      openModal('prompt', {
+          title: 'Rename Item',
+          message: `Enter new name for "${currentName}"`,
+          defaultValue: currentName,
+          onConfirm: async (newName) => {
+              if (newName && newName !== currentName) {
+                  const newPath = path.substring(0, path.lastIndexOf('/') + 1) + newName;
+                  await renameFile(path, newPath);
+              }
+          }
+      });
   };
 
   const handleDownload = () => {
@@ -99,30 +135,63 @@ export default function FileTree() {
     URL.revokeObjectURL(url);
   };
 
+  const onNodeContextMenu = (e: React.MouseEvent, path: string, type: 'file' | 'directory') => {
+      e.preventDefault();
+      e.stopPropagation();
+      setContextMenu({ x: e.clientX, y: e.clientY, path, type });
+  };
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-2 border-b border-[var(--bg-tertiary)] bg-[var(--bg-secondary)]">
+    <div className="flex flex-col h-full relative" onContextMenu={(e) => e.preventDefault()}>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between p-2 border-b border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] shrink-0">
         <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)]">Explorer</span>
         <div className="flex items-center gap-1">
-            <button onClick={handleNewFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)]" title="New File">
+            <button onClick={handleNewFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" title="New File">
                 <FilePlus size={14} />
             </button>
-            <button onClick={handleDelete} disabled={!selectedFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-red-400 disabled:opacity-30" title="Delete Selected">
+            <button onClick={() => handleDelete()} disabled={!selectedFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-red-400 disabled:opacity-30 transition-colors" title="Delete Selected">
                 <Trash2 size={14} />
             </button>
-            <button onClick={handleDownload} disabled={!selectedFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--accent-green)] disabled:opacity-30" title="Download Selected">
+            <button onClick={handleDownload} disabled={!selectedFile} className="p-1 hover:bg-[var(--bg-tertiary)] rounded text-[var(--text-secondary)] hover:text-[var(--accent-green)] disabled:opacity-30 transition-colors" title="Download Selected">
                 <Download size={14} />
-            </button>
-            <button onClick={() => refreshFileTree()} className="text-[10px] ml-2 hover:text-[var(--text-primary)] uppercase tracking-wide">
-                Refresh
             </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto font-mono text-sm py-2">
+
+      {/* Tree */}
+      <div className="flex-1 overflow-y-auto font-mono text-sm py-2" onClick={() => selectFile(null!)}>
         {fileTree.map((node) => (
-            <FileTreeNode key={node.path} node={node} level={0} />
+            <FileTreeNode 
+                key={node.path} 
+                node={node} 
+                level={0} 
+                onContextMenu={onNodeContextMenu} 
+            />
         ))}
       </div>
+
+      {/* Context Menu */}
+      {contextMenu && (
+          <div 
+            ref={menuRef}
+            className="fixed z-50 bg-[var(--bg-secondary)] border border-[var(--bg-tertiary)] rounded shadow-xl py-1 min-w-[120px] animate-in fade-in zoom-in-95 duration-100"
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+          >
+              <button 
+                onClick={() => { handleRename(contextMenu.path); setContextMenu(null); }}
+                className="w-full text-left px-4 py-1.5 text-xs hover:bg-[var(--accent-blue)] hover:text-white transition-colors flex items-center gap-2"
+              >
+                  <span>Rename...</span>
+              </button>
+              <button 
+                onClick={() => { handleDelete(contextMenu.path); setContextMenu(null); }}
+                className="w-full text-left px-4 py-1.5 text-xs hover:bg-red-500 hover:text-white text-red-400 transition-colors flex items-center gap-2"
+              >
+                  <span>Delete</span>
+              </button>
+          </div>
+      )}
     </div>
   );
 }

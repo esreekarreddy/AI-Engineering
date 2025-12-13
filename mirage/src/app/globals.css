@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void-black: #050505;
+  --color-void-panel: #0a0a0a;
+  --color-void-border: #27272a;
+  
+  --color-neon-violet: #7c3aed;
+  --color-neon-cyan: #06b6d4;
+  --color-neon-pink: #db2777;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #050505; /* Deep Void Black */
+  --foreground: #fafafa;
+
+  --panel-bg: rgba(10, 10, 10, 0.6); /* Glass Panel */
+  --panel-border: rgba(255, 255, 255, 0.08);
+
+  --accent: #7c3aed;
+  --accent-glow: rgba(124, 58, 237, 0.4);
+
+  --canvas-bg: #000000;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 30%);
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-border);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Tldraw Overrides */
+.tl-container {
+  background-color: transparent !important;
+}
+
+.tl-background {
+  fill: var(--canvas-bg) !important;
+}
+
+/* Selection Glow */
+::selection {
+  background: var(--accent);
+  color: white;
+}

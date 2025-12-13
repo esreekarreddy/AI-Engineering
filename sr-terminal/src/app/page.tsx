@@ -3,13 +3,14 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useShell } from '@/hooks/use-shell';
-import { Cpu, Wifi, Play } from 'lucide-react';
+import { Cpu, Wifi, Play, HelpCircle } from 'lucide-react';
 import FileTree from '@/components/filesystem/FileTree';
 import { useState } from 'react';
 import clsx from 'clsx';
 import { useFileStore } from '@/lib/file-store';
 import { useModalStore } from '@/lib/modal-store';
 import BootLoader from '@/components/os/BootLoader';
+import HelpModal from '@/components/ui/HelpModal';
 
 // Dynamic imports to avoid SSR issues with heavy client-side libs
 const CodeEditor = dynamic(() => import('@/components/editor/CodeEditor'), { ssr: false });
@@ -28,6 +29,7 @@ export default function Home() {
   const { openModal } = useModalStore();
   const [booted, setBooted] = useState(false);
   const [showAi, setShowAi] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [terminals, setTerminals] = useState<string[]>(['main']);
   const [activeTerminal, setActiveTerminal] = useState('main');
 
@@ -40,28 +42,34 @@ export default function Home() {
 
   return (
     <main className="h-screen w-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] font-mono overflow-hidden">
-      {!booted && <BootLoader onBootComplete={() => {
+      {!booted && <BootLoader onBootComplete={async () => {
         setBooted(true);
-        useFileStore.getState().refreshFileTree();
+        // Try to restore saved project from localStorage
+        const restored = await useFileStore.getState().loadFromLocalStorage();
+        if (!restored) {
+          // If no saved project, just refresh the default file tree
+          await useFileStore.getState().refreshFileTree();
+        }
       }} />}
       <ModalRenderer />
+      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       
       {/* Header / Status Bar */}
-      <header className="h-14 border-b border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] flex items-center justify-between px-4 select-none">
-        <div className="flex items-center gap-3">
+      <header className="h-14 border-b border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] flex items-center justify-between px-4 select-none min-w-[600px]">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="relative w-8 h-8 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[var(--accent-orange)] opacity-20 animate-pulse rounded-full" />
+            <div className="absolute inset-0 bg-[var(--accent-orange)] opacity-20 animate-pulse rounded-full" />
              {/* Ensure logo path is correct and cache is cleared if needed. Next.js might be caching the old image if names are same. */}
              <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain relative z-10" unoptimized />
           </div>
           <div className="flex flex-col">
-              <span className="font-bold tracking-widest text-sm leading-none">SR TERMINAL</span>
-              <span className="text-[10px] text-[var(--text-secondary)] tracking-wider">WEB OPERATING SYSTEM</span>
+              <span className="font-bold tracking-widest text-sm leading-none whitespace-nowrap">SR TERMINAL</span>
+              <span className="text-[10px] text-[var(--text-secondary)] tracking-wider whitespace-nowrap">WEB OPERATING SYSTEM</span>
           </div>
         </div>
         
-        {/* Central Actions */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+        {/* Central Actions - visible on larger screens or flexed properly */}
+        <div className="flex-1 flex justify-center mx-4">
             <button 
                 onClick={async () => {
                    if (!selectedFile) return;
@@ -70,15 +78,24 @@ export default function Home() {
                    runCommand(`node ${selectedFile.split('/').pop()}\n`, activeTerminal); 
                 }}
                 disabled={!selectedFile || !booted}
-                className="flex items-center gap-2 px-4 py-1.5 bg-[var(--accent-green)] text-black rounded font-bold text-xs hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="flex items-center gap-2 px-4 py-1.5 bg-[var(--accent-green)] text-black rounded font-bold text-xs hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap"
             >
                 <Play size={14} fill="currentColor" />
-                RUN PREVIEW
+                <span>RUN PREVIEW</span>
             </button>
         </div>
 
         {/* Stats / Controls */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 shrink-0">
+            <button 
+                onClick={() => setShowHelp(true)}
+                className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors whitespace-nowrap"
+                title="User Manual"
+            >
+                <HelpCircle size={14} />
+                <span className="hidden lg:inline">HELP</span>
+            </button>
+            <div className="h-4 w-[1px] bg-[var(--bg-tertiary)]" />
             <button 
                 onClick={openResources}
                 className="flex items-center gap-2 text-xs text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
@@ -98,94 +115,103 @@ export default function Home() {
                 )}
             >
                 <Wifi size={14} />
-                <span>AI NETLNK</span>
+                <span>AI NETLINK</span>
             </button>
         </div>
       </header>
 
-      {/* Main Workspace */}
+      {/* Content Wrapper */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 border-r border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] flex flex-col">
-          <FileTree />
-        </div>
+        
+        {/* LEFT COLUMN: Sidebar + Editor + Terminal */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#0D0E11]">
+            
+            {/* Top Section: Sidebar & Editor */}
+            <div className="flex-1 flex overflow-hidden">
+                {/* Sidebar - Hidden on mobile, fixed width on desktop */}
+                <aside className="hidden md:flex flex-col w-48 xl:w-64 border-r border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] shrink-0 z-10">
+                    <FileTree />
+                </aside>
 
-        {/* Editor Area */}
-        <div className="flex-1 relative">
-          <CodeEditor />
-        </div>
-
-        {/* AI Panel */}
-        {showAi && (
-            <div className="w-80 border-l border-[var(--bg-tertiary)] bg-[var(--bg-secondary)]">
-                <AIChat />
+                {/* Editor Area */}
+                <main className="flex-1 relative min-w-0 bg-[#0D0E11]">
+                    <CodeEditor />
+                </main>
             </div>
-        )}
-      </div>
 
-      {/* Terminal Panel */}
-      <div className="h-64 mt-auto border-t border-[var(--bg-tertiary)] bg-[var(--terminal-bg)] flex flex-col transition-all duration-300">
-         {/* Tabs */}
-         <div className="flex items-center bg-[var(--bg-secondary)] border-b border-[var(--bg-tertiary)]">
-            {terminals.map((id) => (
-                <button
-                    key={id}
-                    onClick={() => setActiveTerminal(id)}
-                    className={clsx(
-                        "px-3 py-1 text-[10px] font-bold uppercase tracking-wider border-r border-[var(--bg-tertiary)] flex items-center gap-2 transition-colors",
-                         activeTerminal === id 
-                            ? "bg-[var(--terminal-bg)] text-[var(--accent-orange)]" 
-                            : "text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]"
-                    )}
-                >
-                    <span className="opacity-50">#</span> {id}
-                    {terminals.length > 1 && (
-                        <span 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const newTerms = terminals.filter(t => t !== id);
-                                setTerminals(newTerms);
-                                if (activeTerminal === id) setActiveTerminal(newTerms[0]);
-                            }}
-                            className="hover:text-red-400"
+            {/* Bottom Section: Terminal Panel */}
+            <div className="h-48 md:h-64 border-t border-[var(--bg-tertiary)] bg-[var(--terminal-bg)] flex flex-col transition-all duration-300 shrink-0">
+                {/* Tabs */}
+                <div className="flex items-center bg-[var(--bg-secondary)] border-b border-[var(--bg-tertiary)]">
+                    {terminals.map((id) => (
+                        <button
+                            key={id}
+                            onClick={() => setActiveTerminal(id)}
+                            className={clsx(
+                                "px-3 py-1 text-[10px] font-bold uppercase tracking-wider border-r border-[var(--bg-tertiary)] flex items-center gap-2 transition-colors",
+                                activeTerminal === id 
+                                    ? "bg-[var(--terminal-bg)] text-[var(--accent-orange)]" 
+                                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]"
+                            )}
                         >
-                            ×
-                        </span>
-                    )}
-                </button>
-            ))}
-            <button 
-                onClick={() => {
-                    const newId = `term-${terminals.length + 1}`;
-                    setTerminals([...terminals, newId]);
-                    setActiveTerminal(newId);
-                }}
-                className="px-2 py-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
-                title="New Terminal"
-            >
-                +
-            </button>
-         </div>
-
-         {/* Terminals Container */}
-         <div className="flex-1 relative p-2">
-            {terminals.map((id) => (
-                <div 
-                    key={id} 
-                    className={clsx(
-                        "absolute inset-2 rounded overflow-hidden border border-[var(--bg-tertiary)] bg-black/50 backdrop-blur-sm",
-                        activeTerminal === id ? "z-10 opacity-100 pointer-events-auto" : "z-0 opacity-0 pointer-events-none"
-                    )}
-                >
-                     <div className="absolute top-2 right-2 z-20 pointer-events-none">
-                        <div className="bg-[var(--accent-orange)] text-[var(--terminal-bg)] text-[10px] font-bold px-1.5 py-0.5 rounded opacity-50">
-                            JSH
-                        </div>
-                     </div>
-                     <Terminal onTerminalReady={(term) => startShell(id, term)} />
+                            <span className="opacity-50">#</span> {id}
+                            {terminals.length > 1 && (
+                                <span 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const newTerms = terminals.filter(t => t !== id);
+                                        setTerminals(newTerms);
+                                        if (activeTerminal === id) setActiveTerminal(newTerms[0]);
+                                    }}
+                                    className="hover:text-red-400"
+                                >
+                                    ×
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                    <button 
+                        onClick={() => {
+                            const newId = `term-${terminals.length + 1}`;
+                            setTerminals([...terminals, newId]);
+                            setActiveTerminal(newId);
+                        }}
+                        className="px-2 py-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
+                        title="New Terminal"
+                    >
+                        +
+                    </button>
                 </div>
-            ))}
-         </div>
+
+                {/* Terminals Container */}
+                <div className="flex-1 relative p-2">
+                    {terminals.map((id) => (
+                        <div 
+                            key={id} 
+                            className={clsx(
+                                "absolute inset-2 rounded overflow-hidden border border-[var(--bg-tertiary)] bg-black/50 backdrop-blur-sm",
+                                activeTerminal === id ? "z-10 opacity-100 pointer-events-auto" : "z-0 opacity-0 pointer-events-none"
+                            )}
+                        >
+                            <div className="absolute top-2 right-2 z-20 pointer-events-none">
+                                <div className="bg-[var(--accent-orange)] text-[var(--terminal-bg)] text-[10px] font-bold px-1.5 py-0.5 rounded opacity-50">
+                                    JSH
+                                </div>
+                            </div>
+                            <Terminal onTerminalReady={(term) => startShell(id, term)} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        {/* RIGHT COLUMN: AI Chat Panel */}
+        {showAi && (
+            <aside className="w-full md:w-[360px] lg:w-[400px] border-l border-[var(--bg-tertiary)] bg-[var(--bg-secondary)] shrink-0 z-20 flex flex-col h-full shadow-xl md:shadow-none">
+                 <AIChat />
+            </aside>
+        )}
+
       </div>
     </main>
   );
