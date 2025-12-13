@@ -1,119 +1,137 @@
-# CORTEX
+# Cortex
 
-**AI-Powered Code Review Council**
+> **Live Demo:** [sr-cortex.vercel.app](https://sr-cortex.vercel.app)
 
-A multi-agent code review system that runs locally using [Ollama](https://ollama.ai). Six specialized AI agents analyze your code from different perspectives—architecture, security, performance, and more—then produce ranked, actionable findings.
+A multi-agent code review system that runs locally using Ollama. Six specialized AI agents analyze your code from different perspectives—architecture, security, performance, and more—then produce ranked, actionable findings.
 
-![CORTEX Screenshot](docs/screenshot.png)
+## 🌐 Overview
+
+Cortex convenes a "council" of AI specialists to review your code. Each agent has a distinct role and preferred model, producing findings that are cross-validated and ranked by severity. The result is a comprehensive code review that would typically require multiple human experts.
+
+## 🤖 AI Integration
+
+**Runtime:** Ollama (local inference server)
+
+**Agent Configuration:**
+
+| Agent          | Specialty     | Default Model     | Purpose                                 |
+| -------------- | ------------- | ----------------- | --------------------------------------- |
+| **Moderator**  | Orchestration | mistral-small3.2  | Coordinates review, synthesizes verdict |
+| **Architect**  | Design        | mistral-small3.2  | Structure, patterns, maintainability    |
+| **Sentinel**   | Security      | deepseek-coder-v2 | Bugs, vulnerabilities, edge cases       |
+| **Optimizer**  | Performance   | phi4              | Bottlenecks, complexity, efficiency     |
+| **Maintainer** | Quality       | mistral-small3.2  | Tests, error handling, DX               |
+| **Verifier**   | Validation    | deepseek-r1       | Cross-checks claims against code        |
+
+**Technical Details:**
+
+- Streaming responses with real-time chat updates
+- `keep_alive: 0` for immediate model unloading (memory efficiency)
+- Automatic fallback to available models if preferred model is missing
+- Configurable temperature and context window per agent
 
 ## ✨ Features
 
-- **🧠 Multi-Agent Analysis** - 6 specialized agents review your code in parallel
-- **🔒 100% Local** - Runs on your machine, code never leaves your computer
-- **⚡ Memory Optimized** - Agents unload after use to minimize RAM usage
-- **📱 Responsive UI** - Works on desktop and mobile devices
-- **🎯 Ranked Findings** - Issues sorted by severity (P0-Critical to P3-Minor)
-- **💡 Actionable Fixes** - Each finding includes concrete code suggestions
+### 🏛️ Multi-Agent Council
 
-## 🏛️ The Council
+- **Parallel Analysis** — Agents review concurrently for faster results
+- **Specialized Perspectives** — Each agent focuses on their domain expertise
+- **Cross-Validation** — Verifier challenges claims from other agents
+- **Synthesized Verdict** — Moderator produces final ranked output
 
-| Agent          | Role                                            | Model             |
-| -------------- | ----------------------------------------------- | ----------------- |
-| **MODERATOR**  | Orchestrates the review, produces final verdict | mistral-small3.2  |
-| **ARCHITECT**  | Reviews structure, patterns, readability        | mistral-small3.2  |
-| **SENTINEL**   | Finds bugs, security issues, edge cases         | deepseek-coder-v2 |
-| **OPTIMIZER**  | Identifies performance bottlenecks              | phi4              |
-| **MAINTAINER** | Suggests tests and refactoring                  | mistral-small3.2  |
-| **VERIFIER**   | Validates findings against actual code          | deepseek-r1       |
+### 🎯 Intelligent Findings
+
+- **Severity Ranking** — P0 (Critical) to P3 (Minor) classification
+- **Evidence-Based** — Each finding cites specific code locations
+- **Actionable Fixes** — Concrete patch snippets included
+- **Trade-off Analysis** — Notes potential downsides of suggested changes
+
+### 💾 Memory Optimized
+
+- **Sequential Unloading** — Models freed after each agent completes
+- **8GB Viable** — Works with smaller models on limited hardware
+- **Large Model Support** — 32GB+ enables deepseek-coder-v2, llama3.3:70b
+
+### 🎨 Developer Experience
+
+- **Monaco Editor** — VS Code-grade code input with syntax highlighting
+- **Real-Time Chat** — Watch agents discuss in the council panel
+- **Verdict Dashboard** — Sortable findings with severity badges
+- **Dark UI** — Glassmorphism design with agent-colored accents
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-1. **Install Ollama** - [ollama.ai/download](https://ollama.ai/download)
-2. **Pull at least one model**:
+1. **Install Ollama** — [ollama.ai/download](https://ollama.ai/download)
+2. **Pull models:**
    ```bash
-   ollama pull llama3    # Good starting point
-   # OR for better results:
    ollama pull mistral
    ollama pull deepseek-coder
+   ollama pull phi3
    ```
-3. **Start Ollama**:
+3. **Start Ollama:**
    ```bash
    ollama serve
    ```
 
-### Run CORTEX
+### Run Cortex
 
 ```bash
-# Clone the repo
-git clone https://github.com/esreekarreddy/AI-Engineering.git
-cd AI-Engineering/cortex
-
 # Install dependencies
 npm install
 
-# Start the dev server
+# Start dev server
 npm run dev
-```
 
-Open [http://localhost:3000](http://localhost:3000)
+# Open browser
+open http://localhost:3000
+```
 
 ## 📖 Usage
 
-1. **Paste your code** into the editor
+1. **Paste code** into the Monaco editor
 2. **Click "Review"** to convene the council
-3. **Watch the agents** discuss in the Chat panel
+3. **Watch agents** discuss in the Chat panel
 4. **Review findings** in the Verdict panel (sorted by severity)
-5. **Apply suggested fixes** to improve your code
+5. **Apply fixes** based on agent suggestions
 
-## 💻 System Requirements
-
-| RAM   | Capability                                     |
-| ----- | ---------------------------------------------- |
-| 8GB   | Small models only (phi3, llama3:8b)            |
-| 16GB  | Medium models (mistral, llama3)                |
-| 32GB+ | Large models (deepseek-coder-v2, llama3.3:70b) |
-
-**Note**: CORTEX uses `keep_alive: 0` to unload models immediately after each agent call, so you can run multiple large models sequentially even with limited RAM.
-
-## 🔧 Configuration
-
-The system auto-detects available Ollama models and assigns them to agents. To manually configure:
-
-1. Edit `src/lib/agents/types.ts`
-2. Update the `defaultModel` and `fallbackModels` for each agent
-
-## 📁 Project Structure
+## 🏗️ Architecture
 
 ```
 cortex/
 ├── src/
 │   ├── app/
-│   │   ├── api/ollama/    # Ollama proxy bridge
-│   │   └── page.tsx       # Main UI
+│   │   ├── api/ollama/       # Ollama proxy bridge with streaming
+│   │   └── page.tsx          # Main council UI
 │   ├── components/
-│   │   ├── council/       # Agent cards, chat, verdict
-│   │   ├── editor/        # Monaco code editor
-│   │   └── ui/            # Reusable components
+│   │   ├── council/          # AgentCard, CouncilChat, VerdictPanel
+│   │   ├── editor/           # Monaco code editor
+│   │   └── ui/               # Badge, CyberButton, GlassPanel
 │   └── lib/
-│       ├── agents/        # Agent types, prompts, orchestrator
-│       └── ollama/        # Ollama client
+│       ├── agents/
+│       │   ├── orchestrator.ts  # Council coordination logic
+│       │   ├── prompts.ts       # Agent-specific system prompts
+│       │   └── types.ts         # Agent/Finding TypeScript types
+│       ├── ollama/
+│       │   └── client.ts        # Ollama API wrapper
+│       └── store.ts             # Zustand global state
 ```
 
-## 🌐 Deployment
+## 💻 System Requirements
 
-CORTEX is designed for **local use only**. The Ollama bridge connects to `localhost:11434`, which isn't accessible from cloud deployments.
+| RAM   | Capability                                     |
+| ----- | ---------------------------------------------- |
+| 8GB   | Small models (phi3, llama3:8b)                 |
+| 16GB  | Medium models (mistral, llama3)                |
+| 32GB+ | Large models (deepseek-coder-v2, llama3.3:70b) |
 
-For a public demo, you would need to:
+## 🔒 Security Notes
 
-1. Host Ollama on a reachable server
-2. Update `OLLAMA_HOST` in `src/app/api/ollama/route.ts`
-
-## 📄 License
-
-MIT
+- **100% Local** — Code never leaves your machine
+- **No External APIs** — All inference via localhost:11434
+- **Open Source** — Full codebase transparency
 
 ---
 
-Built with ❤️ by [Sreekar Reddy](https://github.com/esreekarreddy)
+_Built by [Sreekar Reddy](https://github.com/esreekarreddy)_

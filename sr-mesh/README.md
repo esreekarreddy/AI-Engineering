@@ -1,34 +1,62 @@
 # SR Mesh
 
-**Local-First AI Knowledge Engine** - A 3D knowledge graph that runs entirely in your browser.
+> **Live Demo:** [sr-mesh.vercel.app](https://sr-mesh.vercel.app)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/sr-mesh)
+A local-first 3D knowledge graph that uses client-side AI to generate semantic embeddings and visualize note relationships in an interactive star map.
 
-🌐 **Live Demo:** [sr-mesh.vercel.app](https://sr-mesh.vercel.app)
+## 🌐 Overview
 
----
+SR Mesh transforms your notes into a navigable 3D galaxy. Each thought becomes a star, positioned based on semantic similarity using AI embeddings generated entirely in your browser. Related notes cluster together, making it easy to discover connections you never knew existed.
 
-## ⚡ Features
+## 🤖 AI Integration
 
-### Core
+**Model:** Xenova/all-MiniLM-L6-v2 (23MB, 384-dimensional embeddings)
 
-- **🧠 Local AI** - Transformer models run in WebAssembly (no server, no API keys)
-- **🌌 3D Visualization** - Notes displayed as nodes in an interactive star map
-- **🔍 Semantic Search** - Find notes by meaning, not just keywords
-- **💾 Offline-First** - All data stored in IndexedDB (your browser)
-- **🔒 100% Private** - Zero data leaves your device
+**Runtime:** Transformers.js with ONNX Runtime (WebAssembly)
 
-### v2.0 Enhancements
+**Capabilities:**
 
-- **⚡ Force-Directed Layout** - D3-force-3d physics simulation
-- **🎨 K-Means Clustering** - Auto-group notes by topic with 8 colors
-- **✨ Bloom Post-Processing** - Premium glow effects
-- **🔔 Toast Notifications** - Professional UI feedback
-- **⌨️ Keyboard Shortcuts** - `⌘K` for search, `Escape` to close
-- **📦 Export/Import** - JSON backup and Markdown export
-- **🛡️ Error Boundaries** - Graceful WebGL error handling
+- Semantic embedding generation for all notes
+- Real-time similarity scoring during note creation
+- K-means clustering for automatic topic grouping
+- Cosine similarity search across your knowledge base
 
----
+**Technical Details:**
+
+- Model runs in a dedicated Web Worker (non-blocking UI)
+- Embeddings cached in IndexedDB for instant retrieval
+- K-means++ initialization for balanced cluster colors
+- Vector search with configurable similarity thresholds
+
+## ✨ Features
+
+### 🧠 Local AI Engine
+
+- **100% Browser-Based** — No API keys, no server, no data leaves your device
+- **Sentence Transformers** — State-of-the-art embeddings via WebAssembly
+- **Real-Time Processing** — See related notes as you type
+- **Offline-First** — Works without internet after initial model download
+
+### 🌌 3D Visualization
+
+- **Force-Directed Graph** — D3-force-3d physics simulation
+- **Semantic Clustering** — Notes auto-grouped by topic (8 color categories)
+- **Bloom Post-Processing** — Premium glow effects on nodes
+- **Interactive Navigation** — Click nodes to view, edit, or delete
+
+### 🔍 Semantic Search
+
+- **Meaning-Based Queries** — Find notes by concept, not just keywords
+- **Similarity Ranking** — Results sorted by semantic closeness
+- **Keyboard Shortcuts** — `⌘K` for instant search access
+- **Cross-Note Discovery** — Uncover hidden connections in your knowledge
+
+### 💾 Data Management
+
+- **IndexedDB Persistence** — All data stored locally in your browser
+- **JSON Export/Import** — Full backup and restore functionality
+- **Markdown Export** — Download notes as .md files
+- **Reset Brain** — Clear all data with confirmation
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -37,174 +65,66 @@
 | `⌘K` / `Ctrl+K` | Open Search     |
 | `Escape`        | Close any modal |
 
----
-
-## 🛠️ Tech Stack
-
-| Layer       | Technology                                     |
-| ----------- | ---------------------------------------------- |
-| Framework   | Next.js 16 (App Router)                        |
-| AI Engine   | Transformers.js + ONNX Runtime (WebAssembly)   |
-| Model       | `Xenova/all-MiniLM-L6-v2` (384-dim embeddings) |
-| 3D Graphics | Three.js + React Three Fiber + Postprocessing  |
-| Physics     | D3-force-3d (force-directed layout)            |
-| Vector DB   | IndexedDB with cosine similarity search        |
-| Styling     | Tailwind CSS v4                                |
-
----
-
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
 ```bash
-# Clone the repo
-git clone https://github.com/yourusername/sr-mesh.git
-cd sr-mesh
-
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
+
+# Open browser
+open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
-
-### Build for Production
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## 📖 How It Works
-
-### 1. Adding a Thought
-
-1. Click **"Add Thought"** button
-2. Type your note in the editor
-3. See real-time **related notes** in sidebar
-4. Click **"Save"**
-5. A new colored star appears in the 3D galaxy
-
-### 2. Semantic Search
-
-1. Press **`⌘K`** or click **"Search"** button
-2. Type a query (e.g., "machine learning ideas")
-3. Press Enter
-4. Results are ranked by **semantic similarity**
-
-### 3. Clustering
-
-Notes are automatically grouped by semantic similarity:
-
-| Color     | Label     |
-| --------- | --------- |
-| 🔵 Blue   | Ideas     |
-| 🟣 Violet | Insights  |
-| 💗 Pink   | Questions |
-| 🟠 Orange | Projects  |
-| 🟢 Green  | Learning  |
-| 🩵 Cyan    | Personal  |
-| 🟡 Yellow | Work      |
-| 🔴 Red    | Creative  |
-
-### 4. CRUD Operations
-
-- **View**: Click any node to see full content
-- **Edit**: Modify content (re-vectorizes automatically)
-- **Delete**: Remove with confirmation
-- **Clear All**: Settings → Reset Brain
-
----
-
-## 🧪 Testing
-
-```bash
-# Run unit tests
-npx vitest run
-
-# Run tests in watch mode
-npx vitest
-```
-
-Current test coverage:
-
-- Vector math (cosine similarity)
-- K-means clustering algorithm
-
----
-
-## 📁 Project Structure
+## 🏗️ Architecture
 
 ```
 sr-mesh/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx          # Main UI with CRUD modals
-│   │   ├── layout.tsx        # Root layout + Toast provider
-│   │   └── globals.css       # Global styles
+│   │   ├── page.tsx        # Main UI with CRUD modals
+│   │   └── layout.tsx      # Root layout + Toast provider
 │   ├── components/
 │   │   ├── canvas/
-│   │   │   ├── Scene.tsx     # Three.js Canvas + Postprocessing
-│   │   │   ├── Galaxy.tsx    # 3D nodes with clustering
-│   │   │   ├── ErrorBoundary.tsx  # WebGL error handling
-│   │   │   └── LoadingSkeleton.tsx # Loading animation
+│   │   │   ├── Scene.tsx   # Three.js Canvas + Postprocessing
+│   │   │   ├── Galaxy.tsx  # 3D nodes with clustering
+│   │   │   └── ErrorBoundary.tsx
 │   │   └── ui/
-│   │       └── Toast.tsx     # Notifications + confirm dialogs
+│   │       └── Toast.tsx   # Notifications + dialogs
 │   ├── lib/
-│   │   ├── db.ts             # IndexedDB + vector search
-│   │   ├── clustering.ts     # K-means++ algorithm
-│   │   ├── export-import.ts  # Backup/restore utilities
-│   │   └── types.ts          # TypeScript interfaces
-│   ├── types/
-│   │   └── d3-force-3d.d.ts  # Type definitions
+│   │   ├── db.ts           # IndexedDB + vector search
+│   │   ├── clustering.ts   # K-means++ algorithm
+│   │   ├── export-import.ts
+│   │   └── types.ts
 │   └── workers/
-│       └── embedding.worker.ts   # AI inference worker
-└── package.json
+│       └── embedding.worker.ts  # AI inference worker
 ```
+
+## 🛠️ Tech Stack
+
+| Layer       | Technology                            |
+| ----------- | ------------------------------------- |
+| Framework   | Next.js 16 (App Router)               |
+| AI Engine   | Transformers.js + ONNX Runtime (WASM) |
+| 3D Graphics | Three.js + React Three Fiber          |
+| Physics     | D3-force-3d                           |
+| Storage     | IndexedDB with cosine similarity      |
+| Styling     | Tailwind CSS v4                       |
+
+## ⚠️ Requirements
+
+- **Modern Browser** — Chrome/Edge/Firefox with WebAssembly support
+- **Memory** — 2GB+ RAM for model loading
+- **WebGL** — GPU acceleration for 3D rendering
+
+## 🔒 Security Notes
+
+- **Zero Data Transmission** — All processing happens on-device
+- **No API Keys** — Model runs locally via WebAssembly
+- **Browser Sandbox** — Data isolated in IndexedDB
 
 ---
 
-## ⚙️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Main Thread                          │
-│  ┌───────────┐   ┌───────────┐   ┌────────────────────────┐│
-│  │  React    │──▶│ IndexedDB │──▶│  Three.js Renderer     ││
-│  │  + Toast  │   │ (Storage) │   │  + D3-Force + Bloom    ││
-│  └───────────┘   └───────────┘   └────────────────────────┘│
-│        │                                                    │
-│        │ K-Means Clustering (useMemo)                       │
-│        ▼                                                    │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                    Web Worker                           ││
-│  │  ┌─────────────┐   ┌─────────────────────────────────┐ ││
-│  │  │ Transformers│──▶│ ONNX Runtime (WebAssembly)      │ ││
-│  │  │     .js     │   │ all-MiniLM-L6-v2 (23MB)         │ ││
-│  │  └─────────────┘   └─────────────────────────────────┘ ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Key Design Decisions:**
-
-- **Web Worker**: AI inference runs in a separate thread (prevents UI freezing)
-- **useMemo**: Force simulation and clustering computed synchronously (no useState in effects)
-- **K-Means++**: Better centroid initialization for color variety
-- **Error Boundary**: Graceful fallback if WebGL fails
-
----
-
-## 📄 License
-
-MIT © Sreekar Reddy
+_Built by [Sreekar Reddy](https://github.com/esreekarreddy)_

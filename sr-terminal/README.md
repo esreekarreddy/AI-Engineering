@@ -1,63 +1,109 @@
-# SR TERMINAL (V2.2)
+# SR Terminal
 
-> **Live Demo**: [sr-terminal.vercel.app](https://sr-terminal.vercel.app)
->
-> **"God Tier" Web-Based Operating System** — Built with Next.js 16, WebContainers, and React.
+> **Live Demo:** [sr-terminal.vercel.app](https://sr-terminal.vercel.app)
 
-## 🌌 Overview
+A browser-based operating system with an integrated AI coding assistant. Runs a complete Node.js runtime entirely client-side using WebContainers, with on-device AI inference powered by WebLLM.
 
-SR Terminal is a high-performance, in-browser operating system capable of running Node.js runtime environments entirely client-side. It features a cinematic visual design ("Aerospace" Theme), advanced file management, and specific optimizations for stability and usability.
+## 🌐 Overview
+
+SR Terminal brings a full development environment to the browser — no backend required. It combines a WebContainer-powered Node.js runtime, a Monaco code editor, a multi-tabbed terminal interface, and an AI assistant that runs entirely on your GPU using Microsoft's Phi-3 model.
+
+## 🤖 AI Integration
+
+**Model:** Microsoft Phi-3-mini-4k-instruct (3.8B parameters)
+
+**Runtime:** WebLLM (MLC) with WebGPU acceleration
+
+**Capabilities:**
+
+- Natural language to code generation
+- Code explanation and debugging assistance
+- Contextual suggestions based on current file
+- Fully private — no data leaves your browser
+
+**Technical Details:**
+
+- Model quantized to 4-bit (q4f16) for efficient browser execution
+- Runs in a dedicated Web Worker to prevent UI blocking
+- Progress callback for real-time download status
+- Automatic model caching via IndexedDB
 
 ## ✨ Features
 
-### 🖥️ Core OS
+### 🖥️ WebContainer Runtime
 
-- **In-Memory Filesystem**: powered by `@webcontainer/api`, providing a fast, ephemeral dev environment.
-- **Cinematic Bootloader**: Matrix-style initialization sequence.
-- **Multi-Terminal**: Tabbed interface support for parallel shell sessions.
+- **In-Memory Filesystem** — Fast, ephemeral development environment
+- **Node.js 18 Execution** — Run JavaScript/TypeScript directly in the browser
+- **npm Support** — Install packages and run scripts
 
-### ⚡ "God Tier" UX
+### 💻 Terminal Interface
 
-- **Custom Modals**: Fully themed dialogs for file creation and confirmation (no browser alerts).
-- **Resource Monitor**: Real-time stats for VFS usage and Heap Memory.
-- **Smart Execution**: "Run Preview" automatically saves dirty files before execution.
+- **Multi-Tab Support** — Run parallel shell sessions
+- **XTerm.js Rendering** — Full terminal emulation with ANSI color support
+- **Command History** — Navigate previous commands with arrow keys
 
-### 📂 File Management
+### 📝 Monaco Editor
 
-- **Create/Delete**: Manage files directly from the explorer.
-- **Download**: Export files to your local machine.
-- **Monaco Editor**: VS Code-like editing experience with syntax highlighting.
+- **VS Code Experience** — Syntax highlighting, IntelliSense, error detection
+- **Multi-Language Support** — JavaScript, TypeScript, JSON, Markdown, and more
+- **Integrated File Explorer** — Create, edit, delete, and download files
+
+### 📊 Resource Monitor
+
+- **VFS Usage** — Track virtual filesystem consumption
+- **Heap Memory** — Monitor JavaScript heap allocation
+- **Real-Time Updates** — Live stats in the status bar
+
+### 🎨 Design System
+
+- **Aerospace Theme** — Cinematic dark interface with subtle gradients
+- **Custom Modals** — Themed dialogs replacing browser defaults
+- **Smooth Animations** — Framer Motion transitions throughout
 
 ## 🚀 Getting Started
 
-1. **Install Dependencies**:
+```bash
+# Install dependencies
+npm install
 
-   ```bash
-   npm install
-   ```
+# Run development server
+npm run dev
 
-2. **Run Development Server**:
+# Open browser
+open http://localhost:3000
+```
 
-   ```bash
-   npm run dev
-   ```
+## 🏗️ Architecture
 
-3. **Open Browser**:
-   Navigate to `http://localhost:3000`.
+```
+sr-terminal/
+├── src/
+│   ├── app/              # Next.js App Router
+│   ├── components/
+│   │   ├── ai/           # AI Chat interface
+│   │   ├── editor/       # Monaco code editor
+│   │   ├── filesystem/   # File tree explorer
+│   │   ├── os/           # Resource monitor, bootloader
+│   │   ├── terminal/     # XTerm.js terminal
+│   │   └── ui/           # Shared UI components
+│   └── lib/
+│       ├── ai/           # WebLLM engine & worker
+│       ├── file-store.ts # Zustand file state
+│       └── webcontainer.ts # WebContainer singleton
+```
 
-## 🛠️ Architecture
+## ⚠️ Requirements
 
-- **Next.js App Router**: Core framework.
-- **Zustand**: Global state management (`useFileStore`, `useModalStore`).
-- **WebContainers**: Micro-VM for Node.js execution.
-- **XTerm.js**: Terminal rendering.
-- **Tailwind v4**: High-performance atomic styling.
+- **Modern Browser** — Chrome/Edge 113+ with WebGPU support
+- **GPU** — WebGPU-capable graphics for AI inference
+- **Memory** — 4GB+ RAM recommended for model loading
 
-## ⚠️ Important Notes
+## 🔒 Security Notes
 
-- **Ephemerality**: The file system is **in-memory**. Reloading the page will reset the state (this is by design).
-- **Security**: Requires `Cross-Origin-Embedder-Policy: require-corp` (configured in `next.config.ts`).
+- **Cross-Origin Isolation** — Requires `Cross-Origin-Embedder-Policy: require-corp`
+- **Ephemeral Storage** — Filesystem resets on page reload (by design)
+- **Local AI** — All inference happens on-device, no external API calls
 
 ---
 
-v2.2 - Build 2024.12
+_Built by [Sreekar Reddy](https://github.com/esreekarreddy)_
