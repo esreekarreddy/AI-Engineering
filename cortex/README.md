@@ -2,39 +2,39 @@
 
 > **Live Demo:** [sr-cortex.vercel.app](https://sr-cortex.vercel.app)
 
-A multi-agent code review system that runs locally using Ollama. Six specialized AI agents analyze your code from different perspectives—architecture, security, performance, and more—then produce ranked, actionable findings.
+A multi-agent code review system powered by Ollama Cloud. Six specialized AI agents analyze your code from different perspectives—architecture, security, performance, and more—then produce ranked, actionable findings.
 
 ## 🌐 Overview
 
-Cortex convenes a "council" of AI specialists to review your code. Each agent has a distinct role and preferred model, producing findings that are cross-validated and ranked by severity. The result is a comprehensive code review that would typically require multiple human experts.
+Cortex convenes a "council" of AI specialists to review your code. Each agent has a distinct role and specialized model, producing findings that are cross-validated and ranked by severity. The result is a comprehensive code review that would typically require multiple human experts.
 
 ## 🤖 AI Integration
 
-**Runtime:** Ollama (local inference server)
+**Runtime:** Ollama Cloud API (no local setup required)
 
 **Agent Configuration:**
 
-| Agent          | Specialty     | Default Model     | Purpose                                 |
-| -------------- | ------------- | ----------------- | --------------------------------------- |
-| **Moderator**  | Orchestration | mistral-small3.2  | Coordinates review, synthesizes verdict |
-| **Architect**  | Design        | mistral-small3.2  | Structure, patterns, maintainability    |
-| **Sentinel**   | Security      | deepseek-coder-v2 | Bugs, vulnerabilities, edge cases       |
-| **Optimizer**  | Performance   | phi4              | Bottlenecks, complexity, efficiency     |
-| **Maintainer** | Quality       | mistral-small3.2  | Tests, error handling, DX               |
-| **Verifier**   | Validation    | deepseek-r1       | Cross-checks claims against code        |
+| Agent          | Specialty     | Cloud Model        | Purpose                                 |
+| -------------- | ------------- | ------------------ | --------------------------------------- |
+| **Moderator**  | Orchestration | gpt-oss:120b       | Coordinates review, synthesizes verdict |
+| **Architect**  | Design        | gpt-oss:120b       | Structure, patterns, maintainability    |
+| **Sentinel**   | Security      | deepseek-v3.1:671b | Bugs, vulnerabilities, edge cases       |
+| **Optimizer**  | Performance   | qwen3-coder:480b   | Bottlenecks, complexity, efficiency     |
+| **Maintainer** | Quality       | devstral-2:123b    | Tests, error handling, DX               |
+| **Verifier**   | Validation    | gpt-oss:120b       | Cross-checks claims against code        |
 
 **Technical Details:**
 
 - Streaming responses with real-time chat updates
-- `keep_alive: 0` for immediate model unloading (memory efficiency)
-- Automatic fallback to available models if preferred model is missing
-- Configurable temperature and context window per agent
+- Automatic retry with exponential backoff on rate limits
+- Per-agent error recovery (review continues if one agent fails)
+- Access code protection to prevent API abuse
 
 ## ✨ Features
 
 ### 🏛️ Multi-Agent Council
 
-- **Parallel Analysis** — Agents review concurrently for faster results
+- **Sequential Analysis** — Agents review one-by-one for optimal results
 - **Specialized Perspectives** — Each agent focuses on their domain expertise
 - **Cross-Validation** — Verifier challenges claims from other agents
 - **Synthesized Verdict** — Moderator produces final ranked output
@@ -46,11 +46,18 @@ Cortex convenes a "council" of AI specialists to review your code. Each agent ha
 - **Actionable Fixes** — Concrete patch snippets included
 - **Trade-off Analysis** — Notes potential downsides of suggested changes
 
-### 💾 Memory Optimized
+### ☁️ Cloud-Powered
 
-- **Sequential Unloading** — Models freed after each agent completes
-- **8GB Viable** — Works with smaller models on limited hardware
-- **Large Model Support** — 32GB+ enables deepseek-coder-v2, llama3.3:70b
+- **No Local Setup** — Runs on Ollama's cloud infrastructure
+- **Massive Models** — Access 120B-671B parameter models
+- **Free Tier Available** — Start reviewing code immediately
+- **Access Protected** — Secure code required to prevent abuse
+
+### 🛡️ Robust Error Handling
+
+- **Rate Limit Recovery** — Automatic retry with exponential backoff
+- **Agent Failover** — Review continues even if one agent fails
+- **Meaningful Errors** — Clear messages for auth, model, and network issues
 
 ### 🎨 Developer Experience
 
@@ -61,40 +68,25 @@ Cortex convenes a "council" of AI specialists to review your code. Each agent ha
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### For Users
 
-1. **Install Ollama** — [ollama.ai/download](https://ollama.ai/download)
-2. **Pull models:**
-   ```bash
-   ollama pull mistral
-   ollama pull deepseek-coder
-   ollama pull phi3
+1. Visit [sr-cortex.vercel.app](https://sr-cortex.vercel.app)
+2. Enter the access code
+3. Paste your code and click "Review Code"
+
+### For Developers (Self-Hosting)
+
+1. Get an API key from [ollama.com](https://ollama.com/settings/keys)
+2. Set environment variables:
    ```
-3. **Start Ollama:**
-   ```bash
-   ollama serve
+   OLLAMA_API_KEY=your_api_key
+   CORTEX_ACCESS_CODE=your_secret_code  # Optional
    ```
-
-### Run Cortex
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Open browser
-open http://localhost:3000
-```
-
-## 📖 Usage
-
-1. **Paste code** into the Monaco editor
-2. **Click "Review"** to convene the council
-3. **Watch agents** discuss in the Chat panel
-4. **Review findings** in the Verdict panel (sorted by severity)
-5. **Apply fixes** based on agent suggestions
+3. Deploy to Vercel or run locally:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 ## 🏗️ Architecture
 
@@ -102,35 +94,27 @@ open http://localhost:3000
 cortex/
 ├── src/
 │   ├── app/
-│   │   ├── api/ollama/       # Ollama proxy bridge with streaming
+│   │   ├── api/ollama/       # Ollama Cloud proxy with auth
 │   │   └── page.tsx          # Main council UI
 │   ├── components/
 │   │   ├── council/          # AgentCard, CouncilChat, VerdictPanel
 │   │   ├── editor/           # Monaco code editor
-│   │   └── ui/               # Badge, CyberButton, GlassPanel
+│   │   └── ui/               # AccessGate, CyberButton, GlassPanel
 │   └── lib/
 │       ├── agents/
-│       │   ├── orchestrator.ts  # Council coordination logic
+│       │   ├── orchestrator.ts  # Error-resilient council logic
 │       │   ├── prompts.ts       # Agent-specific system prompts
-│       │   └── types.ts         # Agent/Finding TypeScript types
+│       │   └── types.ts         # Cloud model configurations
 │       ├── ollama/
-│       │   └── client.ts        # Ollama API wrapper
+│       │   └── client.ts        # Cloud API client
 │       └── store.ts             # Zustand global state
 ```
 
-## 💻 System Requirements
+## 🔒 Security
 
-| RAM   | Capability                                     |
-| ----- | ---------------------------------------------- |
-| 8GB   | Small models (phi3, llama3:8b)                 |
-| 16GB  | Medium models (mistral, llama3)                |
-| 32GB+ | Large models (deepseek-coder-v2, llama3.3:70b) |
-
-## 🔒 Security Notes
-
-- **100% Local** — Code never leaves your machine
-- **No External APIs** — All inference via localhost:11434
-- **Open Source** — Full codebase transparency
+- **Access Protected** — Secret code required to use the app
+- **API Key Server-Side** — Never exposed to the client
+- **No Code Storage** — Your code is not stored after review
 
 ---
 

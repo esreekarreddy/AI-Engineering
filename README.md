@@ -1,6 +1,6 @@
 # AI Engineering
 
-A portfolio of production-grade AI applications showcasing **local-first inference**, **multi-agent orchestration**, **generative UI**, and **in-browser AI execution**. Each project demonstrates advanced architectural patterns and modern web technologies.
+A portfolio of production-grade AI applications showcasing **cloud AI orchestration**, **local-first inference**, **generative UI**, and **in-browser AI execution**. Each project demonstrates advanced architectural patterns and modern web technologies.
 
 ## 📂 Projects
 
@@ -33,23 +33,23 @@ A multi-agent code review system where six specialized AI agents analyze code fr
 
 **Tech Stack:** Next.js 16, TypeScript, Tailwind CSS v4, Zustand, Monaco Editor
 
-**AI Models (via Ollama):**
-| Agent | Role | Default Model |
-|-------|------|---------------|
-| Moderator | Orchestration & Verdict | mistral-small3.2 |
-| Architect | Structure & Patterns | mistral-small3.2 |
-| Sentinel | Security & Bugs | deepseek-coder-v2 |
-| Optimizer | Performance | phi4 |
-| Maintainer | Tests & Refactoring | mistral-small3.2 |
-| Verifier | Claim Validation | deepseek-r1 |
+**AI Models (via Ollama Cloud):**
+| Agent | Role | Cloud Model |
+|-------|------|-------------|
+| Moderator | Orchestration & Verdict | gpt-oss:120b |
+| Architect | Structure & Patterns | gpt-oss:120b |
+| Sentinel | Security & Bugs | deepseek-v3.1:671b |
+| Optimizer | Performance | qwen3-coder:480b |
+| Maintainer | Tests & Refactoring | devstral-2:123b |
+| Verifier | Claim Validation | gpt-oss:120b |
 
 **Key Features:**
 
-- **Multi-Agent Parallel Analysis** — 6 specialized agents review code concurrently
-- **100% Local Execution** — Code never leaves your machine
-- **Memory-Optimized Pipeline** — Models unload after each agent call (`keep_alive: 0`)
+- **Multi-Agent Cloud Analysis** — 6 specialized agents powered by Ollama Cloud
+- **Massive Models** — Access to 120B-671B parameter models
+- **Robust Error Handling** — Retry logic, rate limit recovery, agent failover
 - **Severity-Ranked Findings** — Issues sorted P0 (Critical) to P3 (Minor)
-- **Actionable Fix Suggestions** — Each finding includes concrete code patches
+- **Access Protected** — Secret code prevents API abuse
 
 ---
 
@@ -94,13 +94,13 @@ A local-first 3D knowledge graph that uses client-side AI to generate semantic e
 
 ## 🛠️ Technical Highlights
 
-| Capability              | Implementation                          |
-| ----------------------- | --------------------------------------- |
-| In-Browser AI           | WebLLM (WebGPU), Transformers.js (WASM) |
-| Local LLM Orchestration | Ollama API with streaming responses     |
-| Browser-Based Node.js   | WebContainers for sandboxed execution   |
-| State Management        | Zustand with TypeScript                 |
-| UI Framework            | Next.js 16 App Router + Tailwind CSS v4 |
+| Capability             | Implementation                           |
+| ---------------------- | ---------------------------------------- |
+| Cloud AI Orchestration | Ollama Cloud API with multi-model agents |
+| In-Browser AI          | WebLLM (WebGPU), Transformers.js (WASM)  |
+| Browser-Based Node.js  | WebContainers for sandboxed execution    |
+| State Management       | Zustand with TypeScript                  |
+| UI Framework           | Next.js 16 App Router + Tailwind CSS v4  |
 
 ---
 

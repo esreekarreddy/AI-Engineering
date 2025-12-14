@@ -1,10 +1,4 @@
-// Ollama Client for CORTEX
-
-interface OllamaModel {
-  name: string;
-  modified_at: string;
-  size: number;
-}
+// Ollama Cloud Client for CORTEX
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -21,7 +15,6 @@ interface ChatOptions {
 
 class OllamaClient {
   private static instance: OllamaClient;
-  private availableModels: string[] = [];
   private isConnected: boolean = false;
 
   private constructor() {}
@@ -46,37 +39,29 @@ class OllamaClient {
         return false;
       }
       
-      const data = await res.json();
-      this.availableModels = (data.models || []).map((m: OllamaModel) => m.name);
-      this.isConnected = this.availableModels.length > 0;
-      return this.isConnected;
+      this.isConnected = true;
+      return true;
     } catch {
       this.isConnected = false;
       return false;
     }
   }
 
-  getAvailableModels(): string[] {
-    return this.availableModels;
-  }
-
-  isModelAvailable(model: string): boolean {
-    return this.availableModels.some(m => m.includes(model));
-  }
-
-  findBestModel(preferred: string, fallbacks: string[]): string | null {
-    // Check preferred first
-    if (this.isModelAvailable(preferred)) {
-      return this.availableModels.find(m => m.includes(preferred)) || null;
+  async verifyAccessCode(code: string): Promise<boolean> {
+    try {
+      const res = await fetch('/api/ollama', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify-access', code })
+      });
+      
+      if (!res.ok) return false;
+      
+      const data = await res.json();
+      return data.valid === true;
+    } catch {
+      return false;
     }
-    // Try fallbacks
-    for (const fallback of fallbacks) {
-      if (this.isModelAvailable(fallback)) {
-        return this.availableModels.find(m => m.includes(fallback)) || null;
-      }
-    }
-    // Return first available as last resort
-    return this.availableModels[0] || null;
   }
 
   async chat(options: ChatOptions): Promise<string> {
@@ -95,7 +80,10 @@ class OllamaClient {
     });
 
     if (!res.ok) {
-      throw new Error(`Ollama chat failed: ${res.status}`);
+      if (res.status === 429) {
+        throw new Error('Rate limit exceeded. Try again later.');
+      }
+      throw new Error(`Ollama Cloud error: ${res.status}`);
     }
 
     if (stream && res.body) {

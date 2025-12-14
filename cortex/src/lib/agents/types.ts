@@ -39,8 +39,7 @@ export interface Finding {
 export interface AgentConfig {
   role: AgentRole;
   name: string;
-  defaultModel: string;
-  fallbackModels: string[];
+  model: string;  // Cloud model
   color: string;
   icon: string;
   description: string;
@@ -80,13 +79,12 @@ export interface CouncilVerdict {
   nextSteps: string[];
 }
 
-// Agent configurations
+// Cloud model configurations for each agent
 export const AGENTS: Record<AgentRole, AgentConfig> = {
   moderator: {
     role: 'moderator',
     name: 'MODERATOR',
-    defaultModel: 'mistral-small3.2',
-    fallbackModels: ['llama3.3', 'llama3.2', 'llama3', 'mistral'],
+    model: 'gpt-oss:120b-cloud',
     color: '#a855f7', // violet
     icon: '👁️',
     description: 'Orchestrates the council, synthesizes findings, produces verdict'
@@ -94,8 +92,7 @@ export const AGENTS: Record<AgentRole, AgentConfig> = {
   architect: {
     role: 'architect',
     name: 'ARCHITECT',
-    defaultModel: 'mistral-small3.2',
-    fallbackModels: ['llama3.3', 'llama3.2', 'llama3', 'mistral'],
+    model: 'gpt-oss:120b-cloud',
     color: '#3b82f6', // blue
     icon: '🏛️',
     description: 'Reviews structure, patterns, readability, maintainability'
@@ -103,8 +100,7 @@ export const AGENTS: Record<AgentRole, AgentConfig> = {
   sentinel: {
     role: 'sentinel',
     name: 'SENTINEL',
-    defaultModel: 'deepseek-coder-v2:lite',
-    fallbackModels: ['qwen2.5-coder:14b', 'deepseek-coder', 'codellama', 'llama3'],
+    model: 'deepseek-v3.1:671b-cloud',
     color: '#ef4444', // red
     icon: '🛡️',
     description: 'Finds bugs, security issues, edge cases'
@@ -112,8 +108,7 @@ export const AGENTS: Record<AgentRole, AgentConfig> = {
   optimizer: {
     role: 'optimizer',
     name: 'OPTIMIZER',
-    defaultModel: 'phi4:14b',
-    fallbackModels: ['phi4-reasoning:14b', 'phi3', 'mistral', 'llama3'],
+    model: 'qwen3-coder:480b-cloud',
     color: '#22c55e', // green
     icon: '⚡',
     description: 'Identifies performance bottlenecks, complexity issues'
@@ -121,8 +116,7 @@ export const AGENTS: Record<AgentRole, AgentConfig> = {
   maintainer: {
     role: 'maintainer',
     name: 'MAINTAINER',
-    defaultModel: 'mistral-small3.2',
-    fallbackModels: ['mistral', 'llama3.2', 'llama3', 'phi3'],
+    model: 'devstral-2:123b-cloud',
     color: '#f59e0b', // amber
     icon: '🔧',
     description: 'Improves tests, error handling, developer experience'
@@ -130,8 +124,7 @@ export const AGENTS: Record<AgentRole, AgentConfig> = {
   verifier: {
     role: 'verifier',
     name: 'VERIFIER',
-    defaultModel: 'deepseek-r1:14b',
-    fallbackModels: ['deepseek-r1:7b', 'phi4', 'phi3', 'llama3'],
+    model: 'gpt-oss:120b-cloud',
     color: '#06b6d4', // cyan
     icon: '✓',
     description: 'Validates claims against code, flags speculation'

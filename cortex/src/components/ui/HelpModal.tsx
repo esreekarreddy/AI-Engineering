@@ -1,111 +1,227 @@
 'use client';
 
-import { useEffect } from 'react';
-import { X, Code, MessageCircle, CheckCircle, Brain, Shield, Zap, Wrench, Eye } from 'lucide-react';
-import clsx from 'clsx';
+import { X, Brain, Shield, Cpu, Zap, Wrench, CheckCircle, Sparkles } from 'lucide-react';
+import { AGENTS, AgentRole } from '@/lib/agents/types';
 
 interface HelpModalProps {
   onClose: () => void;
 }
 
+const AGENT_ICONS: Record<AgentRole, React.ReactNode> = {
+  moderator: <Brain size={18} />,
+  architect: <Cpu size={18} />,
+  sentinel: <Shield size={18} />,
+  optimizer: <Zap size={18} />,
+  maintainer: <Wrench size={18} />,
+  verifier: <CheckCircle size={18} />,
+};
+
+const AGENT_COLORS: Record<AgentRole, string> = {
+  moderator: 'var(--agent-moderator)',
+  architect: 'var(--agent-architect)',
+  sentinel: 'var(--agent-sentinel)',
+  optimizer: 'var(--agent-optimizer)',
+  maintainer: 'var(--agent-maintainer)',
+  verifier: 'var(--agent-verifier)',
+};
+
 export function HelpModal({ onClose }: HelpModalProps) {
-  // Close on ESC
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
-
-  const steps = [
-    { icon: Code, title: 'Paste Code', desc: 'Drop any code snippet into the editor' },
-    { icon: MessageCircle, title: 'Run Review', desc: 'Click "Review Code" to start the council' },
-    { icon: CheckCircle, title: 'Get Feedback', desc: 'Receive ranked findings with fixes' },
-  ];
-
-  const agents = [
-    { icon: Eye, name: 'Moderator', desc: 'Orchestrates and produces verdict', color: 'var(--agent-moderator)' },
-    { icon: Brain, name: 'Architect', desc: 'Reviews structure and patterns', color: 'var(--agent-architect)' },
-    { icon: Shield, name: 'Sentinel', desc: 'Finds bugs and security issues', color: 'var(--agent-sentinel)' },
-    { icon: Zap, name: 'Optimizer', desc: 'Spots performance bottlenecks', color: 'var(--agent-optimizer)' },
-    { icon: Wrench, name: 'Maintainer', desc: 'Suggests tests and refactoring', color: 'var(--agent-maintainer)' },
-    { icon: CheckCircle, name: 'Verifier', desc: 'Validates claims against code', color: 'var(--agent-verifier)' },
-  ];
-
   return (
-    <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" 
+        className="absolute inset-0 animate-fade-in"
+        style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
         onClick={onClose}
       />
       
       {/* Dialog */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md z-50 animate-fade-in">
-        <div className="p-6 rounded-2xl bg-[rgb(var(--bg-surface-1))] border border-[var(--border-subtle)] shadow-2xl">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-title text-white">How CORTEX Works</h2>
-            <button 
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--bg-elevated))] transition-colors focus-ring"
+      <div 
+        className="relative w-full max-w-3xl max-h-[85vh] flex flex-col rounded-2xl animate-scale-in overflow-hidden"
+        style={{ 
+          background: 'var(--bg-surface)', 
+          border: '1px solid var(--border-default)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+        }}
+      >
+        {/* Header - Fixed */}
+        <div 
+          className="flex items-center justify-between p-6 border-b shrink-0"
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-subtle)' }}
+        >
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-11 h-11 rounded-xl flex items-center justify-center"
+              style={{ background: 'var(--accent)', boxShadow: '0 4px 12px var(--accent-glow)' }}
             >
-              <X size={16} className="text-[rgb(var(--text-muted))]" />
-            </button>
+              <Sparkles size={22} style={{ color: 'white' }} />
+            </div>
+            <div>
+              <h2 
+                className="text-xl font-bold tracking-tight"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                About Cortex
+              </h2>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                AI-Powered Code Review Council
+              </p>
+            </div>
           </div>
+          
+          <button
+            onClick={onClose}
+            className="p-2.5 rounded-lg transition-colors"
+            style={{ background: 'var(--bg-hover)' }}
+          >
+            <X size={18} style={{ color: 'var(--text-secondary)' }} />
+          </button>
+        </div>
 
-          {/* Steps */}
-          <div className="space-y-3 mb-6">
-            {steps.map((step, idx) => (
-              <div key={idx} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[rgb(var(--accent)/0.1)] flex items-center justify-center shrink-0">
-                  <span className="text-[12px] font-semibold text-[rgb(var(--accent))]">{idx + 1}</span>
-                </div>
-                <div>
-                  <div className="text-[13px] font-medium text-white">{step.title}</div>
-                  <div className="text-[12px] text-[rgb(var(--text-muted))]">{step.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* What is Cortex */}
+          <section className="space-y-3">
+            <h3 
+              className="text-base font-semibold"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              What is Cortex?
+            </h3>
+            <p 
+              className="text-sm leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Cortex is an AI-powered code review platform that uses a council of six specialized AI agents 
+              to analyze your code for security vulnerabilities, performance issues, bugs, and best practices. 
+              Each agent brings unique expertise to provide comprehensive, actionable feedback.
+            </p>
+          </section>
 
-          {/* Agents */}
-          <div className="mb-6">
-            <h3 className="text-section mb-3">The Council</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {agents.map(agent => (
-                <div key={agent.name} className="flex items-center gap-2 p-2 rounded-lg bg-[rgb(var(--bg-surface-2))]">
+          {/* How it Works */}
+          <section className="space-y-4">
+            <h3 
+              className="text-base font-semibold"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              How It Works
+            </h3>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { num: '1', title: 'Paste Code', desc: 'Add your code to the editor' },
+                { num: '2', title: 'Run Review', desc: 'Start the AI council analysis' },
+                { num: '3', title: 'Get Results', desc: 'Review findings with fixes' },
+              ].map((step) => (
+                <div 
+                  key={step.num}
+                  className="p-4 rounded-xl text-center"
+                  style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}
+                >
                   <div 
-                    className="w-6 h-6 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: `rgb(${agent.color} / 0.15)`, color: `rgb(${agent.color})` }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold mx-auto mb-3"
+                    style={{ background: 'var(--accent)', color: 'white' }}
                   >
-                    <agent.icon size={12} />
+                    {step.num}
                   </div>
-                  <div>
-                    <div className="text-[11px] font-medium text-white">{agent.name}</div>
-                    <div className="text-[10px] text-[rgb(var(--text-muted))] leading-tight">{agent.desc}</div>
-                  </div>
+                  <h4 
+                    className="text-sm font-semibold mb-1"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {step.title}
+                  </h4>
+                  <p 
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {step.desc}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
 
-          {/* Footer */}
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className={clsx(
-                "px-4 py-2 rounded-xl text-[13px] font-semibold",
-                "bg-[rgb(var(--accent))] text-white",
-                "hover:brightness-110 transition-all focus-ring"
-              )}
+          {/* AI Agents */}
+          <section className="space-y-4">
+            <h3 
+              className="text-base font-semibold"
+              style={{ color: 'var(--text-primary)' }}
             >
-              Got it
-            </button>
-          </div>
+              The AI Council
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {(Object.entries(AGENTS) as [AgentRole, typeof AGENTS[AgentRole]][]).map(([role, agent]) => {
+                const color = AGENT_COLORS[role];
+                const icon = AGENT_ICONS[role];
+                return (
+                  <div 
+                    key={role}
+                    className="flex items-start gap-3 p-4 rounded-xl"
+                    style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}
+                  >
+                    <div 
+                      className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: color, color: 'white' }}
+                    >
+                      {icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 
+                        className="text-sm font-semibold mb-0.5"
+                        style={{ color: 'var(--text-primary)' }}
+                      >
+                        {agent.name}
+                      </h4>
+                      <p 
+                        className="text-xs leading-relaxed"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {agent.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Tech Stack */}
+          <section 
+            className="flex items-center gap-4 p-4 rounded-xl"
+            style={{ background: 'var(--bg-base)', border: '1px solid var(--border-subtle)' }}
+          >
+            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Built with:</span>
+            <div className="flex items-center gap-3 flex-wrap">
+              {['Next.js', 'TypeScript', 'OpenRouter', 'Multi-LLM'].map((tech) => (
+                <span 
+                  key={tech}
+                  className="px-2.5 py-1 rounded-md text-xs font-medium"
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* Footer - Fixed */}
+        <div 
+          className="flex justify-end p-5 border-t shrink-0"
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-subtle)' }}
+        >
+          <button
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all"
+            style={{ 
+              background: 'var(--accent)',
+              color: 'white',
+              boxShadow: '0 2px 8px var(--accent-glow)'
+            }}
+          >
+            Got it
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

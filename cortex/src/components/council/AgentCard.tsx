@@ -9,28 +9,33 @@ interface AgentCardProps {
   isSpeaking?: boolean;
 }
 
+const AGENT_COLORS: Record<AgentRole, string> = {
+  moderator: 'var(--agent-moderator)',
+  architect: 'var(--agent-architect)',
+  sentinel: 'var(--agent-sentinel)',
+  optimizer: 'var(--agent-optimizer)',
+  maintainer: 'var(--agent-maintainer)',
+  verifier: 'var(--agent-verifier)',
+};
+
 export function AgentCard({ role, isSpeaking = false }: AgentCardProps) {
   const agent = AGENTS[role];
+  const color = AGENT_COLORS[role];
   
   return (
     <div 
       className={clsx(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all cursor-default",
-        "border border-transparent",
-        isSpeaking && "border-[rgb(var(--accent)/0.4)] bg-[rgb(var(--accent)/0.08)]",
-        !isSpeaking && "hover:bg-[rgb(var(--bg-elevated))]"
+        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
+        isSpeaking && "ring-1 ring-[var(--accent)]"
       )}
+      style={{
+        background: isSpeaking ? 'var(--accent-muted)' : 'transparent',
+      }}
     >
       {/* Icon */}
       <div 
-        className={clsx(
-          "w-8 h-8 rounded-lg flex items-center justify-center text-sm",
-          isSpeaking ? "opacity-100" : "opacity-70"
-        )}
-        style={{ 
-          backgroundColor: `rgb(${getAgentColorVar(role)} / 0.15)`,
-          color: `rgb(${getAgentColorVar(role)})`
-        }}
+        className="w-8 h-8 rounded-md flex items-center justify-center text-sm shrink-0"
+        style={{ background: `${color}20`, color }}
       >
         {agent.icon}
       </div>
@@ -38,54 +43,43 @@ export function AgentCard({ role, isSpeaking = false }: AgentCardProps) {
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className={clsx(
-            "text-[12px] font-semibold",
-            isSpeaking ? "text-white" : "text-[rgb(var(--text-primary))]"
-          )}>
+          <span 
+            className="text-sm font-medium"
+            style={{ color: isSpeaking ? 'var(--text-primary)' : 'var(--text-secondary)' }}
+          >
             {agent.name}
           </span>
           {isSpeaking && (
-            <span className="flex items-center gap-1 text-[10px] text-[rgb(var(--accent))]">
-              <span className="w-1 h-1 rounded-full bg-current animate-pulse-dot" />
-              thinking
-            </span>
+            <div className="flex gap-0.5">
+              <span className="w-1 h-1 rounded-full bg-[var(--accent)] animate-pulse" />
+              <span className="w-1 h-1 rounded-full bg-[var(--accent)] animate-pulse" style={{ animationDelay: '150ms' }} />
+              <span className="w-1 h-1 rounded-full bg-[var(--accent)] animate-pulse" style={{ animationDelay: '300ms' }} />
+            </div>
           )}
         </div>
-        <p className="text-[11px] text-[rgb(var(--text-muted))] truncate">
-          {agent.defaultModel}
+        <p 
+          className="text-xs truncate font-mono"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          {agent.model}
         </p>
       </div>
     </div>
   );
 }
 
-function getAgentColorVar(role: AgentRole): string {
-  const map: Record<AgentRole, string> = {
-    moderator: 'var(--agent-moderator)',
-    architect: 'var(--agent-architect)',
-    sentinel: 'var(--agent-sentinel)',
-    optimizer: 'var(--agent-optimizer)',
-    maintainer: 'var(--agent-maintainer)',
-    verifier: 'var(--agent-verifier)',
-  };
-  return map[role];
-}
-
-// Minimal avatar for inline use
 export function AgentAvatar({ role, size = 'md' }: { role: AgentRole; size?: 'sm' | 'md' }) {
   const agent = AGENTS[role];
+  const color = AGENT_COLORS[role];
   
   return (
     <div 
       className={clsx(
-        "rounded-lg flex items-center justify-center shrink-0",
+        "rounded-md flex items-center justify-center shrink-0",
         size === 'sm' && "w-6 h-6 text-xs",
-        size === 'md' && "w-7 h-7 text-sm"
+        size === 'md' && "w-8 h-8 text-sm"
       )}
-      style={{ 
-        backgroundColor: `rgb(${getAgentColorVar(role)} / 0.15)`,
-        color: `rgb(${getAgentColorVar(role)})`
-      }}
+      style={{ background: `${color}20`, color }}
     >
       {agent.icon}
     </div>
