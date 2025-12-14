@@ -4,7 +4,7 @@
   --color-void-black: #050505;
   --color-void-panel: #0a0a0a;
   --color-void-border: #27272a;
-  
+
   --color-neon-violet: #7c3aed;
   --color-neon-cyan: #06b6d4;
   --color-neon-pink: #db2777;
@@ -33,9 +33,16 @@ body {
   overflow: hidden;
   height: 100vh;
   width: 100vw;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 0% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 30%);
+  background-image: radial-gradient(
+      circle at 50% 0%,
+      rgba(124, 58, 237, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(6, 182, 212, 0.05) 0%,
+      transparent 30%
+    );
 }
 
 /* Glassmorphism Utilities */
@@ -60,10 +67,18 @@ body {
 /* Tldraw Overrides */
 .tl-container {
   background-color: transparent !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .tl-background {
   fill: var(--canvas-bg) !important;
+}
+
+/* Ensure tldraw fills parent */
+.tldraw__editor {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Selection Glow */

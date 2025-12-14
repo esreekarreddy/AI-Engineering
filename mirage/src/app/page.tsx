@@ -5,7 +5,8 @@ import {
   Panel, 
   PanelGroup 
 } from "react-resizable-panels";
-import { Tldraw, Editor } from 'tldraw';
+import dynamic from 'next/dynamic';
+import type { Editor } from 'tldraw';
 import 'tldraw/tldraw.css';
 import { Wand2, Loader2, RefreshCw, HelpCircle, Download } from 'lucide-react';
 import { useState, useEffect } from "react";
@@ -19,6 +20,12 @@ import { ModelManager } from "@/components/ui/ModelManager";
 import { CyberButton } from "@/components/ui/CyberButton";
 import { HelpModal } from "@/components/ui/HelpModal";
 import { AccessCodeModal } from "@/components/ui/AccessCodeModal";
+
+// Dynamic import tldraw with SSR disabled - required for production
+const Tldraw = dynamic(
+  () => import('tldraw').then((mod) => mod.Tldraw),
+  { ssr: false, loading: () => <div className="flex items-center justify-center h-full text-zinc-500">Loading canvas...</div> }
+);
 
 export default function Home() {
   const [editor, setEditor] = useState<Editor | null>(null);
@@ -347,12 +354,13 @@ export default function Home() {
             {/* Left: Canvas (Input) */}
             <Panel defaultSize={45} minSize={20} maxSize={70} className="relative bg-[#09090b]">
                 <div className="absolute inset-0 bg-[radial-gradient(#1f1f22_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
-                <Tldraw 
-                    persistenceKey="mirage-canvas" 
-                    onMount={setEditor}
-                    hideUi={false}
-                    className="z-10"
-                />
+                <div className="absolute inset-0 z-10">
+                  <Tldraw 
+                      persistenceKey="mirage-canvas" 
+                      onMount={setEditor}
+                      hideUi={false}
+                  />
+                </div>
             </Panel>
 
             <PanelResizeHandle className="w-1 bg-[#18181b] hover:bg-violet-600 transition-colors flex items-center justify-center group focus:outline-none">
