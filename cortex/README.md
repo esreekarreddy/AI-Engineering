@@ -1,6 +1,6 @@
 # Cortex
 
-> **Live Demo:** [sr-cortex.vercel.app](https://sr-cortex.vercel.app)
+> **Live Demo:** [cortex.sreekarreddy.com](https://cortex.sreekarreddy.com)
 
 A multi-agent code review system powered by Ollama Cloud. Six specialized AI agents analyze your code from different perspectives—architecture, security, performance, and more—then produce ranked, actionable findings.
 
@@ -70,7 +70,7 @@ Cortex convenes a "council" of AI specialists to review your code. Each agent ha
 
 ### For Users
 
-1. Visit [sr-cortex.vercel.app](https://sr-cortex.vercel.app)
+1. Visit [cortex.sreekarreddy.com](https://cortex.sreekarreddy.com)
 2. Enter the access code
 3. Paste your code and click "Review Code"
 

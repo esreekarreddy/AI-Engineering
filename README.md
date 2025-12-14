@@ -10,7 +10,7 @@ A portfolio of production-grade AI applications showcasing **cloud AI orchestrat
 
 A browser-based operating system with an integrated AI assistant, built entirely client-side using WebContainers and WebLLM.
 
-**[Live Demo](https://sr-terminal.vercel.app)**
+**[Live Demo](https://terminal.sreekarreddy.com)**
 
 **Tech Stack:** Next.js 16, WebContainer API, WebLLM (MLC), XTerm.js, Monaco Editor, Zustand, Tailwind CSS v4
 
@@ -31,7 +31,7 @@ A browser-based operating system with an integrated AI assistant, built entirely
 
 A multi-agent code review system where six specialized AI agents analyze code from different perspectives, producing ranked findings with actionable fixes.
 
-**[Live Demo](https://sr-cortex.vercel.app)**
+**[Live Demo](https://cortex.sreekarreddy.com)**
 
 **Tech Stack:** Next.js 16, TypeScript, Tailwind CSS v4, Zustand, Monaco Editor
 
@@ -59,7 +59,7 @@ A multi-agent code review system where six specialized AI agents analyze code fr
 
 A sketch-to-code engine that uses **Vision AI** to transform hand-drawn wireframes into production-ready React components with live preview.
 
-**[Live Demo](https://sr-mirage.vercel.app)**
+**[Live Demo](https://mirage.sreekarreddy.com)**
 
 **Tech Stack:** Next.js 16, tldraw, WebContainer API, Ollama Cloud, Tailwind CSS v4
 
@@ -79,7 +79,7 @@ A sketch-to-code engine that uses **Vision AI** to transform hand-drawn wirefram
 
 A local-first 3D knowledge graph that uses client-side AI to generate semantic embeddings and visualize note relationships in 3D space.
 
-**[Live Demo](https://sr-mesh.vercel.app)**
+**[Live Demo](https://mesh.sreekarreddy.com)**
 
 **Tech Stack:** Next.js 16, Transformers.js (WebAssembly), React Three Fiber, IndexedDB, Zustand
 

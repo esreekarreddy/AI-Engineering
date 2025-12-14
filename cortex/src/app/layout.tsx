@@ -15,33 +15,82 @@ const jetbrainsMono = JetBrains_Mono({
 const siteConfig = {
   name: "CORTEX",
   description: "AI-powered multi-agent code review council. Get expert analysis from specialized AI agents powered by Ollama Cloud.",
-  url: "https://sr-cortex.vercel.app",
+  url: "https://cortex.sreekarreddy.com",
   author: "Sreekar Reddy",
   authorUrl: "https://sreekarreddy.com",
-  keywords: ["AI code review", "multi-agent", "Ollama Cloud", "Sreekar Reddy", "code analysis", "deepseek", "qwen", "developer tools"],
+  keywords: ["Sreekar Reddy", "Sreekar Reddy Edulapalli", "Sreekar Reddy Portfolio", "Sreekar Reddy Projects", "AI code review", "multi-agent", "Ollama Cloud", "code analysis", "deepseek", "qwen", "developer tools"],
+};
+
+// JSON-LD structured data for rich results
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": siteConfig.name,
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web Browser",
+      "description": siteConfig.description,
+      "url": siteConfig.url,
+      "author": {
+        "@type": "Person",
+        "@id": "https://sreekarreddy.com/#person",
+        "name": "Sreekar Reddy",
+        "url": "https://sreekarreddy.com",
+        "sameAs": [
+          "https://linkedin.com/in/esreekarreddy",
+          "https://github.com/esreekarreddy",
+          "https://twitter.com/esreekarreddy"
+        ]
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Multi-agent AI code review council",
+        "Specialized AI personas (Architect, Security, Performance)",
+        "Ollama Cloud integration",
+        "Real-time code analysis"
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": siteConfig.url,
+      "name": `${siteConfig.name} by Sreekar Reddy`,
+      "description": siteConfig.description,
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Sreekar Reddy Projects",
+        "url": "https://sreekarreddy.com"
+      }
+    }
+  ]
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | AI Code Review Council`,
+    default: `${siteConfig.name} by Sreekar Reddy | AI Code Review Council`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   authors: [{ name: siteConfig.author, url: siteConfig.authorUrl }],
   creator: siteConfig.author,
+  publisher: siteConfig.author,
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: siteConfig.name,
+    title: `${siteConfig.name} by Sreekar Reddy`,
     description: siteConfig.description,
-    siteName: siteConfig.name,
+    siteName: `${siteConfig.name} by Sreekar Reddy`,
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.name,
+    title: `${siteConfig.name} by Sreekar Reddy`,
     description: siteConfig.description,
     creator: "@esreekarreddy",
   },
@@ -64,6 +113,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
@@ -72,3 +127,4 @@ export default function RootLayout({
     </html>
   );
 }
+

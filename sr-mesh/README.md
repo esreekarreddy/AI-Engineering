@@ -1,6 +1,6 @@
 # SR Mesh
 
-> **Live Demo:** [sr-mesh.vercel.app](https://sr-mesh.vercel.app)
+> **Live Demo:** [mesh.sreekarreddy.com](https://mesh.sreekarreddy.com)
 
 A local-first 3D knowledge graph that uses client-side AI to generate semantic embeddings and visualize note relationships in an interactive star map.
 

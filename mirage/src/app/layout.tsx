@@ -12,12 +12,63 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// JSON-LD structured data for rich results
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Mirage",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web Browser",
+      "description": "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
+      "url": "https://mirage.sreekarreddy.com",
+      "author": {
+        "@type": "Person",
+        "@id": "https://sreekarreddy.com/#person",
+        "name": "Sreekar Reddy",
+        "url": "https://sreekarreddy.com",
+        "sameAs": [
+          "https://linkedin.com/in/esreekarreddy",
+          "https://github.com/esreekarreddy",
+          "https://twitter.com/esreekarreddy"
+        ]
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Sketch to code generation",
+        "Vision AI (GPT-4o/Ollama)",
+        "tldraw infinite canvas",
+        "React/Tailwind code output"
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://mirage.sreekarreddy.com",
+      "name": "Mirage by Sreekar Reddy",
+      "description": "Generative AI that transforms sketches into React components.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Sreekar Reddy Projects",
+        "url": "https://sreekarreddy.com"
+      }
+    }
+  ]
+};
+
 export const metadata: Metadata = {
-  title: "Mirage | Sketch to Code AI",
-  description: "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
+  title: "Mirage by Sreekar Reddy | Sketch to Code AI",
+  description: "Mirage by Sreekar Reddy - Transform wireframe sketches into React components with Vision AI.",
   keywords: [
     "Mirage",
     "Sreekar Reddy",
+    "Sreekar Reddy Edulapalli",
+    "Sreekar Reddy Portfolio",
+    "Sreekar Reddy Projects",
     "sreekar mirage",
     "sketch to code",
     "wireframe to react",
@@ -30,23 +81,24 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Sreekar Reddy", url: "https://sreekarreddy.com" }],
   creator: "Sreekar Reddy",
-  metadataBase: new URL("https://sr-mirage.vercel.app"),
+  publisher: "Sreekar Reddy",
+  metadataBase: new URL("https://mirage.sreekarreddy.com"),
   openGraph: {
-    title: "Mirage | Sketch to Code AI",
+    title: "Mirage by Sreekar Reddy | Sketch to Code AI",
     description: "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
-    url: "https://sr-mirage.vercel.app",
-    siteName: "Mirage",
+    url: "https://mirage.sreekarreddy.com",
+    siteName: "Mirage by Sreekar Reddy",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mirage | Sketch to Code AI",
+    title: "Mirage by Sreekar Reddy | Sketch to Code AI",
     description: "Transform wireframe sketches into React components with Vision AI.",
     creator: "@esreekarreddy",
   },
   alternates: {
-    canonical: "https://sr-mirage.vercel.app",
+    canonical: "https://mirage.sreekarreddy.com",
   },
   verification: {
     google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
@@ -64,6 +116,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen overflow-hidden`}
       >
@@ -72,3 +130,4 @@ export default function RootLayout({
     </html>
   );
 }
+
