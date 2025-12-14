@@ -13,12 +13,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://sreekarreddy.com/projects/mirage/:path*",
-      "permanent": true
-    }
   ]
 }

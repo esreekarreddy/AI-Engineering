@@ -15,10 +15,10 @@ const jetbrainsMono = JetBrains_Mono({
 const siteConfig = {
   name: "CORTEX",
   description: "AI-powered multi-agent code review council. Get expert analysis from specialized AI agents powered by Ollama Cloud.",
-  url: "https://sreekarreddy.com/projects/cortex",
+  url: "https://sr-cortex.vercel.app",
   author: "Sreekar Reddy",
   authorUrl: "https://sreekarreddy.com",
-  keywords: ["AI code review", "multi-agent", "Ollama Cloud", "Sreekar Reddy", "Sreekar Edulapalli", "sreekarreddy.com", "Sreekar Reddy AI", "Sreekar Reddy portfolio", "code analysis", "deepseek", "qwen", "developer tools"],
+  keywords: ["AI code review", "multi-agent", "Ollama Cloud", "Sreekar Reddy", "code analysis", "deepseek", "qwen", "developer tools"],
 };
 
 export const metadata: Metadata = {

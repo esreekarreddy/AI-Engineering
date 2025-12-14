@@ -1,6 +1,6 @@
 # Mirage
 
-> **Live Demo:** [sreekarreddy.com/projects/mirage](https://sreekarreddy.com/projects/mirage) | **Portfolio:** [sreekarreddy.com](https://sreekarreddy.com)
+> **Live Demo:** [sr-mirage.vercel.app](https://sr-mirage.vercel.app) | **Portfolio:** [sreekarreddy.com](https://sreekarreddy.com)
 
 A **vision-powered** sketch-to-code engine that transforms hand-drawn wireframes into React components using Ollama Cloud's Qwen3-VL 235B model.
 
