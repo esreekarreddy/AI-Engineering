@@ -1,13 +1,14 @@
 import clsx from 'clsx';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface GlassPanelProps {
   children: ReactNode;
   className?: string;
   variant?: 'base' | 'flat' | 'heavy';
+  style?: CSSProperties;
 }
 
-export function GlassPanel({ children, className, variant = 'base' }: GlassPanelProps) {
+export function GlassPanel({ children, className, variant = 'base', style }: GlassPanelProps) {
   return (
     <div 
         className={clsx(
@@ -19,6 +20,7 @@ export function GlassPanel({ children, className, variant = 'base' }: GlassPanel
             },
             className
         )}
+        style={style}
     >
         {/* Shine effect overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />

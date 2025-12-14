@@ -1,87 +1,64 @@
 # Mirage
 
-> **Live Demo:** [sr-mirage.vercel.app](https://sr-mirage.vercel.app)
+> **Live Demo:** [sr-mirage.vercel.app](https://sr-mirage.vercel.app) | **Portfolio:** [sreekarreddy.com](https://sreekarreddy.com)
 
-A sketch-to-code AI that transforms hand-drawn wireframes into production-ready React components with live preview, powered by tldraw and WebContainers.
+A **vision-powered** sketch-to-code engine that transforms hand-drawn wireframes into React components using Ollama Cloud's Qwen3-VL 235B model.
 
-## 🌐 Overview
+## ✨ How It Works
 
-Mirage combines a full-featured drawing canvas with an in-browser Vite development environment. Draw your UI concepts, click "Make It Real," and watch as AI generates working React/Tailwind code rendered in a live preview — all running client-side.
+1. **Draw** — Sketch your UI on the canvas with shapes, colors, and text
+2. **Generate** — Click "Make It Real" → Vision AI sees your sketch and writes matching code
+3. **Refine** — Chat to tweak: "Make the button blue", "Add a header"
 
 ## 🤖 AI Integration
 
-**Models:** Ollama-compatible LLMs (llama3, deepseek-coder, mistral, etc.)
+**Model:** Qwen3-VL 235B (Ollama Cloud) — Vision-language model that "sees" your sketch
 
-**Runtime:** Local Ollama server with streaming responses
+**Pipeline:**
 
-**Capabilities:**
+- Canvas exported as PNG image
+- Image sent to vision model with comprehensive prompt
+- Model analyzes colors, shapes, text, and positions
+- Returns React + Tailwind code matching your sketch
 
-- Scene-to-prompt conversion (shapes, positions, labels extracted)
-- React/Tailwind code generation optimized for production
-- Iterative refinement via natural language chat
-- Context-aware modifications to existing code
+**Prompt Engineering:**
 
-**Technical Details:**
+- Chain-of-thought analysis protocol
+- Color extraction with exact Tailwind mappings
+- Spatial layout analysis
+- Quality checklist verification
 
-- Streaming responses for real-time generation feedback
-- Temperature tuned to 0.2 for precise code output
-- 4K context window for complex components
-- Auto-model selection prioritizing coding-optimized models
+## 🔐 Access Protection
 
-## ✨ Features
+The live demo requires an access code to limit API usage:
 
-### 🎨 Canvas-to-Code Pipeline
+- **First Use:** Code entered and validated server-side
+- **Storage:** Code stored with timestamp in localStorage
+- **Expiry:** Automatically clears after 1 hour
+- **Re-entry:** User prompted again after expiry
 
-- **tldraw Integration** — Full-featured vector canvas with shapes, arrows, text
-- **Scene Analysis** — Extracts element hierarchy, positions, and labels
-- **Instant Generation** — Click "Make It Real" to generate React/JSX
-
-### ⚡ In-Browser Preview
-
-- **WebContainer Runtime** — Complete Vite + React dev server running client-side
-- **Hot Module Replacement** — Changes update instantly
-- **Zero Backend** — Everything runs locally in your browser
-
-### 💬 Iterative Refinement
-
-- **Chat Interface** — Describe modifications in natural language
-- **Code-Aware Edits** — AI reads current code before applying changes
-- **Rapid Iteration** — Tweak colors, layout, components conversationally
-
-### 🌙 Design System
-
-- **Cyberpunk Aesthetic** — Dark theme with violet/cyan ambient glows
-- **Glassmorphism UI** — Frosted glass panels and subtle blur effects
-- **Framer Motion** — Smooth animations and micro-interactions
-- **Resizable Panels** — Adjust canvas, preview, and chat proportions
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-1. **Install Ollama** — [ollama.ai/download](https://ollama.ai/download)
-2. **Pull a model:**
-   ```bash
-   ollama pull llama3
-   # OR for better code generation:
-   ollama pull deepseek-coder
-   ```
-3. **Start Ollama:**
-   ```bash
-   ollama serve
-   ```
-
-### Run Mirage
+**For Local Development:**
 
 ```bash
-# Install dependencies
+# .env.local
+OLLAMA_API_KEY=your_ollama_api_key
+MIRAGE_ACCESS_CODE=  # Leave empty for open access
+```
+
+## 🚀 Quick Start
+
+```bash
+# Clone and install
+git clone https://github.com/esreekarreddy/AI-Engineering.git
+cd AI-Engineering/mirage
 npm install
 
-# Run development server
-npm run dev
+# Configure environment
+cp .env.example .env.local
+# Edit .env.local with your Ollama API key
 
-# Open browser
-open http://localhost:3000
+# Run
+npm run dev
 ```
 
 ## 🏗️ Architecture
@@ -90,32 +67,38 @@ open http://localhost:3000
 mirage/
 ├── src/
 │   ├── app/
-│   │   ├── api/ollama/     # Ollama proxy bridge
+│   │   ├── api/ollama/     # Ollama Cloud proxy with auth
 │   │   └── page.tsx        # Main workspace
-│   ├── components/
-│   │   └── ui/             # ChatPanel, ModelManager, Logo
-│   ├── hooks/
-│   │   └── use-webcontainer.ts  # WebContainer singleton
+│   ├── components/ui/
+│   │   ├── AccessCodeModal # Access protection modal
+│   │   ├── ChatPanel       # Refinement chat
+│   │   └── HelpModal       # Setup guide
 │   └── lib/
-│       ├── ai/
-│       │   ├── engine.ts   # Ollama client with streaming
-│       │   └── prompt.ts   # Scene-to-prompt converter
-│       ├── templates.ts    # Base Vite project files
-│       └── webcontainer.ts # File operations
+│       └── ai/engine.ts    # Vision model integration
 ```
 
-## ⚠️ Requirements
+## ⚙️ Tech Stack
 
-- **Modern Browser** — Chrome/Edge with cross-origin isolation support
-- **Ollama** — Running locally on port 11434
-- **Memory** — 8GB+ RAM for model inference
+| Layer     | Technology                     |
+| --------- | ------------------------------ |
+| AI        | Qwen3-VL 235B (Ollama Cloud)   |
+| Canvas    | tldraw vector graphics         |
+| Preview   | WebContainer (in-browser Vite) |
+| Framework | Next.js 16                     |
+| Styling   | Tailwind CSS v4                |
 
-## 🔒 Security Notes
+## 🔒 Security
 
-- **Cross-Origin Isolation** — Requires `Cross-Origin-Embedder-Policy: require-corp`
-- **Local Only** — Ollama bridge connects to `127.0.0.1:11434`
-- **Ephemeral Storage** — WebContainer filesystem resets on reload
+- **API Key Server-Side** — Never exposed to client
+- **Access Code Validated Server-Side** — Only stored after confirmation
+- **1-Hour Expiry** — Automatic re-authentication required
+- **No Code Storage** — Your sketches are not persisted
+
+## 📋 Requirements
+
+- Modern browser (Chrome/Edge)
+- [Ollama API Key](https://ollama.com/settings/keys)
 
 ---
 
-_Built by [Sreekar Reddy](https://github.com/esreekarreddy)_
+_Built by [Sreekar Reddy](https://sreekarreddy.com) • [GitHub](https://github.com/esreekarreddy)_

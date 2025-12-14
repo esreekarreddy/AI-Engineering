@@ -59,7 +59,7 @@ export default async function Image() {
                     MIRAGE
                 </div>
                 <div style={{ fontSize: 30, color: '#a1a1aa', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '-10px' }}>
-                    Generative UI Engine
+                    Sketch to Code with Vision AI
                 </div>
             </div>
         </div>

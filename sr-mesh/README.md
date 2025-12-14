@@ -127,4 +127,4 @@ sr-mesh/
 
 ---
 
-_Built by [Sreekar Reddy](https://github.com/esreekarreddy)_
+_Built by [Sreekar Reddy](https://sreekarreddy.com) • [GitHub](https://github.com/esreekarreddy)_

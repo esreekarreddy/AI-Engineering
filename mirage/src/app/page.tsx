@@ -7,17 +7,18 @@ import {
 } from "react-resizable-panels";
 import { Tldraw, Editor } from 'tldraw';
 import 'tldraw/tldraw.css';
-import { Wand2, Loader2, RefreshCw } from 'lucide-react';
+import { Wand2, Loader2, RefreshCw, HelpCircle, Download } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { useWebContainer } from "@/hooks/use-webcontainer";
 import { BASE_FILES } from "@/lib/templates";
 import { writeFile, installDependencies, runDev } from "@/lib/webcontainer";
 import { aiEngine } from "@/lib/ai/engine";
-import { sceneToPrompt } from "@/lib/ai/prompt";
 import { MirageLogo } from "@/components/ui/Logo";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { ModelManager } from "@/components/ui/ModelManager";
 import { CyberButton } from "@/components/ui/CyberButton";
+import { HelpModal } from "@/components/ui/HelpModal";
+import { AccessCodeModal } from "@/components/ui/AccessCodeModal";
 
 export default function Home() {
   const [editor, setEditor] = useState<Editor | null>(null);
@@ -27,22 +28,59 @@ export default function Home() {
   
   // Chat State (now includes System Logs)
   const [messages, setMessages] = useState<{role: 'user' | 'assistant' | 'system', content: string}[]>([]);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showAccessModal, setShowAccessModal] = useState(false);
+  const [accessCode, setAccessCode] = useState<string | null>(null);
+  const [accessError, setAccessError] = useState<string | undefined>();
+
+  // Load access code from localStorage on mount (with 1-hour expiry)
+  useEffect(() => {
+      const savedData = localStorage.getItem('mirage_access');
+      if (savedData) {
+          try {
+              const { code, timestamp } = JSON.parse(savedData);
+              const ONE_HOUR = 60 * 60 * 1000; // 1 hour in ms
+              const isExpired = Date.now() - timestamp > ONE_HOUR;
+              
+              if (isExpired) {
+                  localStorage.removeItem('mirage_access');
+                  setAccessCode(null);
+              } else {
+                  setAccessCode(code);
+              }
+          } catch {
+              localStorage.removeItem('mirage_access');
+          }
+      }
+  }, []);
 
   const addLog = (msg: string) => {
-      // Strip ANSI codes
-
-      const cleanMsg = msg.replace(/\x1B\[\d+;?\d*m/g, '') // Colors
-                          .replace(/\x1B\[\d*[A-Z]/g, '')   // Cursor moves
-                          .replace(/[^\x20-\x7E\n]/g, '')   // Non-printable
-                          .trim();
-
+      // Strip ANSI codes and terminal noise
+      let cleanMsg = msg
+          .replace(/\x1B\[[0-9;]*[A-Za-z]/g, '')  // ANSI escape sequences
+          .replace(/[\x00-\x1F\x7F]/g, '')         // Control characters
+          .trim();
+      
+      // Filter out spinner characters and short noise
+      const spinnerChars = ['\\', '|', '/', '-', '$'];
+      const isSpinner = cleanMsg.split('').every(c => spinnerChars.includes(c) || c === ' ');
+      if (!cleanMsg || isSpinner || cleanMsg.length < 3) {
+          return;
+      }
+      
+      // Remove leading/trailing $ prompts
+      cleanMsg = cleanMsg.replace(/^\$\s*/, '').replace(/\s*\$$/, '').trim();
       if (!cleanMsg) return;
       
-      // Debounce/Filter progress bars (keywords: [1G, [K, etc handled by regex above, but we filter spam)
       setMessages(prev => {
           const last = prev[prev.length - 1];
-          // If the last message is very similar or it's a progress update, replace it to avoid flood
-          if (last?.role === 'system' && (cleanMsg.includes('install') || cleanMsg.includes('dev'))) {
+          // Avoid duplicate messages
+          if (last?.role === 'system' && last.content === cleanMsg) {
+              return prev;
+          }
+          // Replace progress messages to avoid flood
+          if (last?.role === 'system' && 
+              (cleanMsg.includes('added') || cleanMsg.includes('packages') || cleanMsg.includes('hmr'))) {
               return [...prev.slice(0, -1), { role: 'system', content: cleanMsg }];
           }
           return [...prev, { role: 'system', content: cleanMsg }];
@@ -84,42 +122,136 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!editor || !instance) return;
     
+    // Check AI connection first
+    const aiState = aiEngine.getState();
+    if (aiState.status === 'disconnected' || aiState.status === 'error') {
+        setMessages(prev => [...prev, 
+            { role: 'assistant', content: '⚠️ Ollama is not connected. Please start Ollama first:\n\n1. Run: `ollama serve`\n2. Click the connection button to retry' }
+        ]);
+        return;
+    }
+
+    // Check for access code - show modal if not set
+    if (!accessCode) {
+        setShowAccessModal(true);
+        return;
+    }
+    
     setIsGenerating(true);
     addLog("Reading Canvas...");
     
     try {
         const shapes = editor.getCurrentPageShapes();
         if (shapes.length === 0) {
-            alert("Draw something first!");
+            setMessages(prev => [...prev, 
+                { role: 'assistant', content: '✏️ Draw something on the canvas first, then click "Make It Real"!' }
+            ]);
             setIsGenerating(false);
             return;
         }
 
-        const prompt = sceneToPrompt(shapes);
-        addLog("Thinking...");
+        addLog("📸 Capturing canvas screenshot...");
         
-        const code = await aiEngine.generateCode(prompt);
+        // Export canvas as SVG, then convert to PNG base64
+        const shapeIds = shapes.map(s => s.id);
+        const svg = await editor.getSvgElement(shapeIds, {
+            background: true,
+            padding: 20,
+        });
+        
+        if (!svg) {
+            throw new Error("Failed to export canvas");
+        }
+
+        // Convert SVG to PNG using canvas (full resolution for better AI quality)
+        const svgData = new XMLSerializer().serializeToString(svg.svg);
+        const img = new Image();
+        const canvas = document.createElement('canvas');
+        canvas.width = svg.width;
+        canvas.height = svg.height;
+        
+        await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.fillStyle = '#ffffff'; // White background
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                }
+                resolve();
+            };
+            img.onerror = reject;
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+        });
+        
+        // Get base64 PNG (without data:image/png;base64, prefix)
+        const base64Image = canvas.toDataURL('image/png').split(',')[1];
+        
+        addLog(`🧠 Sending ${canvas.width}x${canvas.height} image to vision model...`);
+        const code = await aiEngine.generateFromImage(base64Image, accessCode);
+        
         addLog("Code generated. Writing to file...");
         
         const cleanCode = extractCodebox(code);
         await writeFile('src/App.jsx', cleanCode);
-        addLog("Updated App.jsx. Hot-reload should trigger.");
+        addLog("Updated App.jsx. Hot-reload triggered.");
         
         // Add implicit message to chat
         setMessages(prev => [...prev, 
-            { role: 'assistant', content: 'I generated the UI based on your sketch. How does it look?' }
+            { role: 'assistant', content: '✨ I generated the UI based on your sketch. How does it look?' }
         ]);
 
     } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e);
-        addLog(`Error: ${errorMessage}`);
+        
+        // Check if this is an auth error
+        if (errorMessage.includes('Invalid access code')) {
+            localStorage.removeItem('mirage_access');
+            setAccessCode(null);
+            setAccessError('Invalid access code. Please try again.');
+            setShowAccessModal(true);
+        } else {
+            addLog(`Error: ${errorMessage}`);
+            setMessages(prev => [...prev, 
+                { role: 'assistant', content: `❌ Generation failed: ${errorMessage}` }
+            ]);
+        }
     } finally {
         setIsGenerating(false);
     }
   };
 
+  // Handle access code submission - verify with server first
+  const handleAccessCodeSubmit = async (code: string) => {
+      const isValid = await aiEngine.verifyAccessCode(code);
+      if (isValid) {
+          setAccessCode(code);
+          // Save with timestamp for 1-hour expiry
+          localStorage.setItem('mirage_access', JSON.stringify({
+              code,
+              timestamp: Date.now()
+          }));
+          setAccessError(undefined);
+          setShowAccessModal(false);
+          // Trigger generation after modal closes
+          setTimeout(() => handleGenerate(), 100);
+      } else {
+          setAccessError('Invalid access code. Please try again.');
+      }
+  };
+
   const handleRefine = async (instruction: string) => {
       if (!instance) return;
+      
+      // Check AI connection first
+      const aiState = aiEngine.getState();
+      if (aiState.status === 'disconnected' || aiState.status === 'error') {
+          setMessages(prev => [...prev, 
+              { role: 'user', content: instruction },
+              { role: 'assistant', content: '⚠️ Ollama is not connected. Start `ollama serve` and reconnect.' }
+          ]);
+          return;
+      }
       
       setMessages(prev => [...prev, { role: 'user', content: instruction }]);
       setIsGenerating(true);
@@ -129,19 +261,40 @@ export default function Home() {
           // Read current code
           const currentCode = await instance.fs.readFile('src/App.jsx', 'utf-8');
           
-          const newCode = await aiEngine.refineCode(currentCode, instruction);
+          const newCode = await aiEngine.refineCode(currentCode, instruction, accessCode || '');
           addLog("Refinement complete. Updating file...");
           
           const cleanCode = extractCodebox(newCode);
           await writeFile('src/App.jsx', cleanCode);
           
-          setMessages(prev => [...prev, { role: 'assistant', content: 'Updated! Anything else?' }]);
+          setMessages(prev => [...prev, { role: 'assistant', content: '✅ Updated! Anything else?' }]);
       } catch (e) {
           const errorMessage = e instanceof Error ? e.message : String(e);
           addLog(`Error: ${errorMessage}`);
-          setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I failed to refine the code.' }]);
+          setMessages(prev => [...prev, { role: 'assistant', content: `❌ Refinement failed: ${errorMessage}` }]);
       } finally {
           setIsGenerating(false);
+      }
+  };
+
+  // Download generated code
+  const handleDownload = async () => {
+      if (!instance) return;
+      
+      try {
+          const code = await instance.fs.readFile('src/App.jsx', 'utf-8');
+          const blob = new Blob([code], { type: 'text/javascript' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'App.jsx';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          addLog('✅ Code downloaded!');
+      } catch {
+          addLog('❌ No code to download yet.');
       }
   };
 
@@ -161,11 +314,18 @@ export default function Home() {
            </div>
            <div className="flex flex-col">
               <h1 className="font-bold tracking-[0.2em] text-sm leading-none text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">MIRAGE</h1>
-              <span className="text-[10px] text-zinc-500 tracking-wider font-mono">GENERATIVE ENGINE v0.3</span>
+              <span className="text-[10px] text-zinc-500 tracking-wider font-mono">GENERATIVE ENGINE</span>
            </div>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+             <button
+                 onClick={() => setShowHelp(true)}
+                 className="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors"
+                 title="About Mirage"
+             >
+                 <HelpCircle size={18} />
+             </button>
              <ModelManager />
 
              <CyberButton 
@@ -221,6 +381,13 @@ export default function Home() {
                             >
                                 <RefreshCw size={14} />
                             </button>
+                            <button 
+                                onClick={handleDownload}
+                                className="p-1.5 hover:bg-white/10 rounded-md text-zinc-400 hover:text-emerald-400 transition-colors" 
+                                title="Download App.jsx"
+                            >
+                                <Download size={14} />
+                            </button>
                         </div>
 
                         {/* Iframe Container - White bg for actual preview correctness */}
@@ -258,6 +425,17 @@ export default function Home() {
 
         </PanelGroup>
       </div>
+
+      {/* Help Modal */}
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      
+      {/* Access Code Modal */}
+      <AccessCodeModal 
+          isOpen={showAccessModal} 
+          onClose={() => setShowAccessModal(false)}
+          onSubmit={handleAccessCodeSubmit}
+          error={accessError}
+      />
     </main>
   );
 }

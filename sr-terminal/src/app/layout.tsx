@@ -12,23 +12,52 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const siteConfig = {
+  name: "SR Terminal",
+  description: "A browser-based operating system with integrated AI assistant. Runs Node.js entirely in your browser using WebContainers and WebLLM.",
+  url: "https://sr-terminal.vercel.app",
+  author: "Sreekar Reddy",
+  authorUrl: "https://sreekarreddy.com",
+  keywords: ["SR Terminal", "Sreekar Reddy", "browser OS", "WebContainers", "WebLLM", "in-browser Node.js", "AI coding assistant", "WebGPU"],
+};
+
 export const metadata: Metadata = {
-  title: "SR Terminal | Local-First Web OS",
-  description: "A secure, sandboxed Node.js environment running entirely in your browser using WebContainers.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name} | Local-First Web OS`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  authors: [{ name: siteConfig.author, url: siteConfig.authorUrl }],
+  creator: siteConfig.author,
   openGraph: {
-    title: "SR Terminal",
-    description: "Browser-based Node.js OS with safe sandboxing.",
-    siteName: "SR Terminal",
     type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "SR Terminal",
-    description: "Browser-based Node.js OS with safe sandboxing.",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    creator: "@esreekarreddy",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  verification: {
+    google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
   },
   icons: {
     icon: "/logo.png",
-  }
+  },
 };
 
 export default function RootLayout({

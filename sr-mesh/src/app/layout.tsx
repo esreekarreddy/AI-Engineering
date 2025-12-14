@@ -2,21 +2,48 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
 
+const siteConfig = {
+  name: "SR Mesh",
+  description: "A local-first 3D knowledge graph with in-browser AI. Visualize your thoughts in a semantic galaxy.",
+  url: "https://sr-mesh.vercel.app",
+  author: "Sreekar Reddy",
+  authorUrl: "https://sreekarreddy.com",
+  keywords: ["SR Mesh", "Sreekar Reddy", "knowledge graph", "3D visualization", "local AI", "semantic search", "browser AI", "transformers.js"],
+};
+
 export const metadata: Metadata = {
-  title: "SR Mesh | Local-First AI Knowledge Engine",
-  description: "A graphical second brain that runs entirely in your browser using local AI and Wasm.",
-  metadataBase: new URL("https://sr-mesh.vercel.app"),
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name} | Local-First AI Knowledge Engine`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  authors: [{ name: siteConfig.author, url: siteConfig.authorUrl }],
+  creator: siteConfig.author,
   openGraph: {
-    title: "SR Mesh",
-    description: "Visualize your thoughts in a 3D galaxy with local AI.",
-    url: "https://sr-mesh.vercel.app",
-    siteName: "SR Mesh",
-    locale: "en_US",
     type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    creator: "@esreekarreddy",
   },
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  verification: {
+    google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
   },
   icons: {
     icon: "/icon.svg",

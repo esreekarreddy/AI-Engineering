@@ -14,10 +14,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 const siteConfig = {
   name: "CORTEX",
-  description: "AI-powered multi-agent code review council. Get expert analysis from specialized AI agents running locally on your machine with Ollama.",
+  description: "AI-powered multi-agent code review council. Get expert analysis from specialized AI agents powered by Ollama Cloud.",
   url: "https://sr-cortex.vercel.app",
   author: "Sreekar Reddy",
-  keywords: ["AI", "code review", "multi-agent", "ollama", "local LLM", "developer tools", "code analysis"],
+  authorUrl: "https://sreekarreddy.com",
+  keywords: ["AI code review", "multi-agent", "Ollama Cloud", "Sreekar Reddy", "code analysis", "deepseek", "qwen", "developer tools"],
 };
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: siteConfig.keywords,
-  authors: [{ name: siteConfig.author }],
+  authors: [{ name: siteConfig.author, url: siteConfig.authorUrl }],
   creator: siteConfig.author,
   openGraph: {
     type: "website",
@@ -42,10 +43,17 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    creator: "@esreekarreddy",
   },
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: siteConfig.url,
+  },
+  verification: {
+    google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
   },
 };
 

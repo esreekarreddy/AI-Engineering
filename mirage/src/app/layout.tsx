@@ -13,12 +13,47 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mirage | Generative UI",
-  description: "Sketch it. Build it. Run it. An offline, privacy-first generative UI engine.",
+  title: "Mirage | Sketch to Code AI",
+  description: "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
+  keywords: [
+    "Mirage",
+    "Sreekar Reddy",
+    "sreekar mirage",
+    "sketch to code",
+    "wireframe to react",
+    "AI code generator",
+    "vision AI",
+    "generative UI",
+    "React component generator",
+    "Ollama",
+    "tldraw"
+  ],
+  authors: [{ name: "Sreekar Reddy", url: "https://sreekarreddy.com" }],
+  creator: "Sreekar Reddy",
+  metadataBase: new URL("https://sr-mirage.vercel.app"),
   openGraph: {
-    title: "Mirage | Generative UI",
-    description: "Sketch it. Build it. Run it. An offline, privacy-first generative UI engine.",
+    title: "Mirage | Sketch to Code AI",
+    description: "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
+    url: "https://sr-mirage.vercel.app",
+    siteName: "Mirage",
     type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mirage | Sketch to Code AI",
+    description: "Transform wireframe sketches into React components with Vision AI.",
+    creator: "@esreekarreddy",
+  },
+  alternates: {
+    canonical: "https://sr-mirage.vercel.app",
+  },
+  verification: {
+    google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
+  },
+  other: {
+    "author-website": "https://sreekarreddy.com",
+    "github": "https://github.com/esreekarreddy",
   }
 };
 
