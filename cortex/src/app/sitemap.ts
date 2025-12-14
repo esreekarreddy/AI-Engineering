@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://sr-cortex.vercel.app';
+  const baseUrl = 'https://sreekarreddy.com/projects/cortex';
   
   return [
     {

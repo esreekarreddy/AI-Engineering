@@ -1,6 +1,6 @@
 # SR Terminal
 
-> **Live Demo:** [sr-terminal.vercel.app](https://sr-terminal.vercel.app)
+> **Live Demo:** [sreekarreddy.com/projects/terminal](https://sreekarreddy.com/projects/terminal)
 
 A browser-based operating system with an integrated AI coding assistant. Runs a complete Node.js runtime entirely client-side using WebContainers, with on-device AI inference powered by WebLLM.
 

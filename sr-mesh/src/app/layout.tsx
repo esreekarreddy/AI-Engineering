@@ -5,10 +5,10 @@ import { ToastProvider } from "@/components/ui/Toast";
 const siteConfig = {
   name: "SR Mesh",
   description: "A local-first 3D knowledge graph with in-browser AI. Visualize your thoughts in a semantic galaxy.",
-  url: "https://sr-mesh.vercel.app",
+  url: "https://sreekarreddy.com/projects/mesh",
   author: "Sreekar Reddy",
   authorUrl: "https://sreekarreddy.com",
-  keywords: ["SR Mesh", "Sreekar Reddy", "knowledge graph", "3D visualization", "local AI", "semantic search", "browser AI", "transformers.js"],
+  keywords: ["SR Mesh", "Sreekar Reddy", "Sreekar Edulapalli", "sreekarreddy.com", "Sreekar Reddy AI", "Sreekar Reddy portfolio", "knowledge graph", "3D visualization", "local AI", "semantic search", "browser AI", "transformers.js"],
 };
 
 export const metadata: Metadata = {
