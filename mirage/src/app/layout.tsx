@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   keywords: [
     "Mirage",
     "Sreekar Reddy",
+    "Sreekar Edulapalli",
+    "sreekarreddy.com",
+    "Sreekar Reddy portfolio",
+    "Sreekar Reddy AI",
     "sreekar mirage",
     "sketch to code",
     "wireframe to react",
@@ -30,11 +34,11 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Sreekar Reddy", url: "https://sreekarreddy.com" }],
   creator: "Sreekar Reddy",
-  metadataBase: new URL("https://sr-mirage.vercel.app"),
+  metadataBase: new URL("https://sreekarreddy.com/projects/mirage"),
   openGraph: {
     title: "Mirage | Sketch to Code AI",
     description: "Transform wireframe sketches into React components with Vision AI. Built by Sreekar Reddy.",
-    url: "https://sr-mirage.vercel.app",
+    url: "https://sreekarreddy.com/projects/mirage",
     siteName: "Mirage",
     type: "website",
     locale: "en_US",
@@ -46,7 +50,7 @@ export const metadata: Metadata = {
     creator: "@esreekarreddy",
   },
   alternates: {
-    canonical: "https://sr-mirage.vercel.app",
+    canonical: "https://sreekarreddy.com/projects/mirage",
   },
   verification: {
     google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",

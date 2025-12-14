@@ -1,4 +1,8 @@
 // Mirage AI Engine - Ollama Cloud Integration
+
+// basePath must match next.config.ts for API routes to work when deployed under subpath
+const BASE_PATH = '/projects/mirage';
+
 export type ModelStatus = "idle" | "connecting" | "connected" | "disconnected" | "generating" | "error";
 
 export interface AIState {
@@ -46,7 +50,7 @@ class OllamaEngine {
   // Verify access code with server
   public async verifyAccessCode(code: string): Promise<boolean> {
       try {
-          const res = await fetch('/api/ollama', {
+          const res = await fetch(`${BASE_PATH}/api/ollama`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'verify-access', code })
@@ -62,7 +66,7 @@ class OllamaEngine {
   public async init() {
     this.setState({ status: "connecting" });
     try {
-        const res = await fetch('/api/ollama', {
+        const res = await fetch(`${BASE_PATH}/api/ollama`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'list' })
@@ -169,7 +173,7 @@ Now analyze the image and generate the React component.`;
       let fullResponse = "";
       
       try {
-          const res = await fetch('/api/ollama', {
+          const res = await fetch(`${BASE_PATH}/api/ollama`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -235,7 +239,7 @@ Now analyze the image and generate the React component.`;
       let fullResponse = "";
       
       try {
-          const res = await fetch('/api/ollama', {
+          const res = await fetch(`${BASE_PATH}/api/ollama`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

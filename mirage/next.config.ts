@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  basePath: "/projects/mirage",
+  assetPrefix: "/projects/mirage",
   // Transpile tldraw for proper ESM handling
   transpilePackages: [
     'tldraw',

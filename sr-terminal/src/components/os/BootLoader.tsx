@@ -35,7 +35,7 @@ export default function BootLoader({ onBootComplete }: { onBootComplete: () => v
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center font-mono text-green-500 text-sm">
       <div className="w-[400px]">
         <div className="mb-8 flex justify-center opacity-80">
-             <img src="/logo.png" alt="SR Terminal" className="w-16 h-16 animate-pulse" />
+             <img src="/projects/terminal/logo.png" alt="SR Terminal" className="w-16 h-16 animate-pulse" />
         </div>
         {lines.map((line, i) => (
           <div key={i}>{line}</div>
