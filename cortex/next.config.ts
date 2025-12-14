@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: "/projects/cortex",
-  assetPrefix: "/projects/cortex",
+  /* config options here */
 };
 
 export default nextConfig;

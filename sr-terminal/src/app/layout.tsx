@@ -15,10 +15,10 @@ const jetbrainsMono = JetBrains_Mono({
 const siteConfig = {
   name: "SR Terminal",
   description: "A browser-based operating system with integrated AI assistant. Runs Node.js entirely in your browser using WebContainers and WebLLM.",
-  url: "https://sreekarreddy.com/projects/terminal",
+  url: "https://sr-terminal.vercel.app",
   author: "Sreekar Reddy",
   authorUrl: "https://sreekarreddy.com",
-  keywords: ["SR Terminal", "Sreekar Reddy", "Sreekar Edulapalli", "sreekarreddy.com", "Sreekar Reddy portfolio", "Sreekar Reddy AI", "browser OS", "WebContainers", "WebLLM", "in-browser Node.js", "AI coding assistant", "WebGPU"],
+  keywords: ["SR Terminal", "Sreekar Reddy", "browser OS", "WebContainers", "WebLLM", "in-browser Node.js", "AI coding assistant", "WebGPU"],
 };
 
 export const metadata: Metadata = {
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     google: "M2DsCJTIe9s1V0OR2mGrrr_xeaYWrwTLvJ622qwIt0M",
   },
   icons: {
-    icon: "/projects/terminal/logo.png",
+    icon: "/logo.png",
   },
 };
 

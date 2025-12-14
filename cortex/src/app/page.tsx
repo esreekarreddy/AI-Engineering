@@ -140,7 +140,7 @@ export default function Home() {
           </button>
           <div className="flex items-center gap-3">
             <Image 
-              src="/projects/cortex/logo.png" 
+              src="/logo.png" 
               alt="Cortex" 
               width={36} 
               height={36} 

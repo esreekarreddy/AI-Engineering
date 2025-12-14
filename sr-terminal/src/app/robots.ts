@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://sreekarreddy.com/projects/terminal/sitemap.xml',
+    sitemap: 'https://sr-terminal.vercel.app/sitemap.xml',
   };
 }

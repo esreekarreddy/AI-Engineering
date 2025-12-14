@@ -1,7 +1,5 @@
 // Ollama Cloud Client for CORTEX
 
-// basePath must match next.config.ts for API routes to work when deployed under subpath
-const BASE_PATH = '/projects/cortex';
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -30,7 +28,7 @@ class OllamaClient {
 
   async checkConnection(): Promise<boolean> {
     try {
-      const res = await fetch(`${BASE_PATH}/api/ollama`, {
+      const res = await fetch('/api/ollama', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'list' })
@@ -51,7 +49,7 @@ class OllamaClient {
 
   async verifyAccessCode(code: string): Promise<boolean> {
     try {
-      const res = await fetch(`${BASE_PATH}/api/ollama`, {
+      const res = await fetch('/api/ollama', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify-access', code })
@@ -69,7 +67,7 @@ class OllamaClient {
   async chat(options: ChatOptions): Promise<string> {
     const { model, messages, stream = true, temperature = 0.2, onToken } = options;
 
-    const res = await fetch(`${BASE_PATH}/api/ollama`, {
+    const res = await fetch('/api/ollama', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

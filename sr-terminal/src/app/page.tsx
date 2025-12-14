@@ -60,7 +60,7 @@ export default function Home() {
           <div className="relative w-8 h-8 flex items-center justify-center">
             <div className="absolute inset-0 bg-[var(--accent-orange)] opacity-20 animate-pulse rounded-full" />
              {/* Ensure logo path is correct and cache is cleared if needed. Next.js might be caching the old image if names are same. */}
-             <Image src="/projects/terminal/logo.png" alt="Logo" width={24} height={24} className="object-contain relative z-10" unoptimized />
+             <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain relative z-10" unoptimized />
           </div>
           <div className="flex flex-col">
               <span className="font-bold tracking-widest text-sm leading-none whitespace-nowrap">SR TERMINAL</span>

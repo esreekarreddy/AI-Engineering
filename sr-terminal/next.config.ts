@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: "/projects/terminal",
-  assetPrefix: "/projects/terminal",
   reactStrictMode: true,
   async headers() {
     return [
