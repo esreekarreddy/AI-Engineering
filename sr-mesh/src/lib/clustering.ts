@@ -1,5 +1,6 @@
 import { cosineSimilarity } from './db';
 import type { Note } from './db';
+import { classifyText } from './textClassifier';
 
 export interface ClusterResult {
   clusterId: number;
@@ -19,10 +20,8 @@ const CLUSTER_COLORS = [
   '#ef4444', // Red
 ];
 
-const CLUSTER_LABELS = [
-  'Ideas', 'Insights', 'Questions', 'Projects',
-  'Learning', 'Personal', 'Work', 'Creative'
-];
+// Labels are now determined dynamically by the textClassifier module
+// based on content analysis rather than cluster position
 
 /**
  * Simple K-means clustering for notes based on embeddings
@@ -42,7 +41,7 @@ export function kMeansClustering(
       result.set(note.id, {
         clusterId: i,
         color: CLUSTER_COLORS[i % CLUSTER_COLORS.length],
-        label: CLUSTER_LABELS[i % CLUSTER_LABELS.length]
+        label: classifyText(note.content)  // Use intelligent classification
       });
     });
     return result;
@@ -123,14 +122,17 @@ export function kMeansClustering(
     }
   }
 
-  // Build result map
+  // Build result map with intelligent label classification
   const result = new Map<string, ClusterResult>();
   notes.forEach((note, i) => {
     const clusterId = assignments[i];
     result.set(note.id, {
       clusterId,
       color: CLUSTER_COLORS[clusterId % CLUSTER_COLORS.length],
-      label: CLUSTER_LABELS[clusterId % CLUSTER_LABELS.length]
+      // Use content-based classification for accurate labels
+      // K-means clustering provides color grouping (semantic similarity)
+      // Text classifier provides meaningful labels based on content patterns
+      label: classifyText(note.content)
     });
   });
 

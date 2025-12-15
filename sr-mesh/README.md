@@ -19,6 +19,7 @@ SR Mesh transforms your notes into a navigable 3D galaxy. Each thought becomes a
 - Semantic embedding generation for all notes
 - Real-time similarity scoring during note creation
 - K-means clustering for automatic topic grouping
+- **Intelligent Text Classification** — Rule-based categorization into 9 categories (Questions, Insights, Facts, Learning, Projects, Personal, Work, Ideas, Creative)
 - Cosine similarity search across your knowledge base
 
 **Technical Details:**
@@ -27,6 +28,7 @@ SR Mesh transforms your notes into a navigable 3D galaxy. Each thought becomes a
 - Embeddings cached in IndexedDB for instant retrieval
 - K-means++ initialization for balanced cluster colors
 - Vector search with configurable similarity thresholds
+- Content-aware labeling using linguistic patterns and keyword matching
 
 ## ✨ Features
 
@@ -40,7 +42,9 @@ SR Mesh transforms your notes into a navigable 3D galaxy. Each thought becomes a
 ### 🌌 3D Visualization
 
 - **Force-Directed Graph** — D3-force-3d physics simulation
-- **Semantic Clustering** — Notes auto-grouped by topic (8 color categories)
+- **Semantic Clustering** — Notes auto-grouped by semantic similarity (8 color themes)
+- **Intelligent Labels** — Content-based categorization (Questions, Insights, Facts, etc.)
+- **Enhanced Tooltips** — Large, readable hover info at any zoom level
 - **Bloom Post-Processing** — Premium glow effects on nodes
 - **Interactive Navigation** — Click nodes to view, edit, or delete
 
@@ -89,13 +93,14 @@ sr-mesh/
 │   ├── components/
 │   │   ├── canvas/
 │   │   │   ├── Scene.tsx   # Three.js Canvas + Postprocessing
-│   │   │   ├── Galaxy.tsx  # 3D nodes with clustering
+│   │   │   ├── Galaxy.tsx  # 3D nodes with enhanced tooltips
 │   │   │   └── ErrorBoundary.tsx
 │   │   └── ui/
 │   │       └── Toast.tsx   # Notifications + dialogs
 │   ├── lib/
 │   │   ├── db.ts           # IndexedDB + vector search
-│   │   ├── clustering.ts   # K-means++ algorithm
+│   │   ├── clustering.ts   # K-means++ with intelligent labels
+│   │   ├── textClassifier.ts # Rule-based text categorization
 │   │   ├── export-import.ts
 │   │   └── types.ts
 │   └── workers/

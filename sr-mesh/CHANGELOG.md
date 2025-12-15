@@ -5,6 +5,40 @@ All notable changes to SR Mesh will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-12-16
+
+### Added
+
+- **Intelligent Text Classification**: Rule-based categorization into 9 meaningful categories
+  - Questions: WH-words, question marks, auxiliary verb starters
+  - Insights: Opinions, evaluations, recommendations
+  - Facts: Definitions, declarative statements, subset relationships
+  - Learning: Educational content, study notes, tutorials
+  - Projects: Development tasks, action items, milestones
+  - Personal: Self-referential content, emotions, goals
+  - Work: Meetings, deadlines, professional context
+  - Ideas: Creative suggestions, hypotheticals
+  - Creative: Artistic content, writing, music
+- **Enhanced Tooltip Visibility**:
+  - Font sizes increased (0.2→0.38, 0.12→0.22)
+  - Background size increased (3.5×0.9→6.0×1.7)
+  - Added colored glow/border effect for better contrast
+  - Readable at 100% zoom without leaning in
+- **textClassifier.ts**: 400-line comprehensive text classification module
+- **textClassifier.test.ts**: 23 tests covering all categories and edge cases
+
+### Changed
+
+- Clustering now uses content-based labels instead of position-based
+- K-means groups notes by semantic similarity (colors), text classifier assigns labels
+- Removed "learn" as standalone keyword to avoid false positives with "machine learning"
+
+### Technical
+
+- 34 total tests passing (11 existing + 23 new)
+- Added `test` script to package.json
+- Fixed Vitest imports for test file
+
 ## [2.0.0] - 2025-12-08
 
 ### Added

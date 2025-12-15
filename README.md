@@ -77,11 +77,11 @@ A sketch-to-code engine that uses **Vision AI** to transform hand-drawn wirefram
 
 ### 4. [SR Mesh](./sr-mesh)
 
-A local-first 3D knowledge graph that uses client-side AI to generate semantic embeddings and visualize note relationships in 3D space.
+A local-first 3D knowledge graph that uses client-side AI to generate semantic embeddings and visualize note relationships in 3D space. Features intelligent text classification and enhanced tooltip visibility.
 
 **[Live Demo](https://mesh.sreekarreddy.com)**
 
-**Tech Stack:** Next.js 16, Transformers.js (WebAssembly), React Three Fiber, IndexedDB, Zustand
+**Tech Stack:** Next.js 16, Transformers.js (WebAssembly), React Three Fiber, IndexedDB, Vitest
 
 **AI Model:** all-MiniLM-L6-v2 (sentence-transformers) — runs entirely in-browser via WASM
 
@@ -90,6 +90,8 @@ A local-first 3D knowledge graph that uses client-side AI to generate semantic e
 - **On-Device Embeddings** — 100% privacy-focused inference using Web Workers
 - **3D Force-Directed Graph** — Interactive particle visualization with physics simulation
 - **Semantic Clustering** — Notes grouped by meaning, not just keywords
+- **Intelligent Text Classification** — Rule-based categorization into 9 categories (Questions, Insights, Facts, Learning, Projects, Personal, Work, Ideas, Creative)
+- **Enhanced Tooltips** — Large, readable hover info at any zoom level
 - **IndexedDB Persistence** — Offline-first storage with full-text search
 
 ---

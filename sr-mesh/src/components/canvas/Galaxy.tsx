@@ -250,41 +250,61 @@ function EnhancedNode({ node, onClick }: EnhancedNodeProps) {
         </mesh>
       )}
       
-      {/* Label on hover */}
+      {/* Label on hover - Enhanced for better visibility */}
       {hovered && (
         <Billboard>
-          <group position={[0, 1.0, 0]}>
-            {/* Background */}
-            <mesh position={[0, 0.1, -0.01]} renderOrder={1}>
-              <planeGeometry args={[3.5, 0.9]} />
+          <group position={[0, 1.5, 0]}>
+            {/* Glow effect behind tooltip */}
+            <mesh position={[0, 0.15, -0.03]} renderOrder={0}>
+              <planeGeometry args={[6.5, 2.2]} />
               <meshBasicMaterial 
-                color="#000" 
+                color={color} 
                 transparent 
-                opacity={0.9} 
+                opacity={0.15} 
                 depthTest={false}
               />
             </mesh>
-            {/* Content */}
+            {/* Border */}
+            <mesh position={[0, 0.15, -0.02]} renderOrder={1}>
+              <planeGeometry args={[6.2, 1.9]} />
+              <meshBasicMaterial 
+                color={color} 
+                transparent 
+                opacity={0.4} 
+                depthTest={false}
+              />
+            </mesh>
+            {/* Background */}
+            <mesh position={[0, 0.15, -0.01]} renderOrder={2}>
+              <planeGeometry args={[6.0, 1.7]} />
+              <meshBasicMaterial 
+                color="#0a0a0f" 
+                transparent 
+                opacity={0.95} 
+                depthTest={false}
+              />
+            </mesh>
+            {/* Content - Main text with larger font */}
             <Text
-              position={[0, 0.2, 0]}
-              fontSize={0.2}
+              position={[0, 0.35, 0]}
+              fontSize={0.38}
               color="white"
               anchorX="center"
               anchorY="middle"
-              maxWidth={3.2}
-              renderOrder={2}
+              maxWidth={5.5}
+              renderOrder={3}
               material-depthTest={false}
             >
-              {content.length > 50 ? content.slice(0, 50) + "..." : content}
+              {content.length > 60 ? content.slice(0, 60) + "..." : content}
             </Text>
-            {/* Cluster label */}
+            {/* Cluster label - More prominent */}
             <Text
-              position={[0, -0.05, 0]}
-              fontSize={0.12}
+              position={[0, -0.15, 0]}
+              fontSize={0.22}
               color={color}
               anchorX="center"
               anchorY="middle"
-              renderOrder={2}
+              renderOrder={3}
               material-depthTest={false}
             >
               {clusterLabel}

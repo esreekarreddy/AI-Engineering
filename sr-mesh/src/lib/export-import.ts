@@ -1,4 +1,6 @@
-import { getAllNotes, saveNote, type Note } from './db';
+import { getAllNotes, saveNote, searchSimilarNotes, type Note } from './db';
+import { classifyText } from './textClassifier';
+import { kMeansClustering } from './clustering';
 
 export interface ExportData {
   version: string;
@@ -76,16 +78,60 @@ export async function importData(file: File): Promise<number> {
 }
 
 /**
- * Export notes as Markdown files (creates a zip-like download)
+ * Export notes as Markdown with categories and connections
  */
 export async function exportAsMarkdown(): Promise<void> {
   const notes = await getAllNotes();
   
-  const markdown = notes.map(note => {
-    const date = new Date(note.createdAt).toLocaleString();
-    return `# Thought\n\n${note.content}\n\n---\n_Created: ${date}_\n\n`;
-  }).join('\n---\n\n');
+  // Get cluster assignments for all notes
+  const clusters = kMeansClustering(notes);
+  
+  // Build markdown with categories and related notes
+  const markdownParts: string[] = [
+    `# SR Mesh Knowledge Export`,
+    ``,
+    `> Exported on ${new Date().toLocaleString()}`,
+    `> Total thoughts: ${notes.length}`,
+    ``,
+    `---`,
+    ``
+  ];
 
+  for (const note of notes) {
+    const category = classifyText(note.content);
+    const cluster = clusters.get(note.id);
+    const date = new Date(note.createdAt).toLocaleString();
+    
+    // Find related notes
+    const relatedNotes = await searchSimilarNotes(note.embedding, 4);
+    const related = relatedNotes
+      .filter(r => r.note.id !== note.id && r.score > 0.5)
+      .slice(0, 3);
+
+    markdownParts.push(`## 💭 ${category}`);
+    markdownParts.push(``);
+    markdownParts.push(`${note.content}`);
+    markdownParts.push(``);
+    
+    if (related.length > 0) {
+      markdownParts.push(`**🔗 Related Thoughts:**`);
+      for (const r of related) {
+        const relatedCategory = classifyText(r.note.content);
+        const preview = r.note.content.length > 60 ? r.note.content.slice(0, 60) + '...' : r.note.content;
+        markdownParts.push(`- _${preview}_ (${relatedCategory}, ${Math.round(r.score * 100)}% match)`);
+      }
+      markdownParts.push(``);
+    }
+    
+    markdownParts.push(`---`);
+    markdownParts.push(`📅 Created: ${date}${cluster ? ` | 🎨 Cluster: ${cluster.clusterId}` : ''}`);
+    markdownParts.push(``);
+    markdownParts.push(`---`);
+    markdownParts.push(``);
+  }
+
+  const markdown = markdownParts.join('\n');
+  
   const blob = new Blob([markdown], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
   

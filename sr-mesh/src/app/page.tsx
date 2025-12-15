@@ -16,7 +16,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { Scene } from "@/components/canvas/Scene";
 import { LoadingSkeleton } from "@/components/canvas/LoadingSkeleton";
-import { Plus, Search, Brain, Loader2, X, Sparkles, Trash2, Edit3, Settings, AlertTriangle, Eye } from "lucide-react";
+import { Plus, Search, Brain, Loader2, X, Sparkles, Trash2, Edit3, Settings, AlertTriangle, Eye, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { SimilarNote } from "@/lib/types";
 import { useToast } from "@/components/ui/Toast";
@@ -32,6 +32,7 @@ export default function Home() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -66,6 +67,7 @@ export default function Home() {
         setIsEditorOpen(false);
         setIsSearchOpen(false);
         setIsSettingsOpen(false);
+        setIsHelpOpen(false);
         setViewingNote(null);
         setEditingNote(null);
       }
@@ -207,13 +209,23 @@ export default function Home() {
         </p>
       </div>
 
-      {/* HUD: Settings Button */}
-      <button 
-        onClick={() => setIsSettingsOpen(true)}
-        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 p-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-all"
-      >
-        <Settings className="w-5 h-5 text-zinc-400" />
-      </button>
+      {/* HUD: Settings & Help Buttons */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 flex gap-2">
+        <button 
+          onClick={() => setIsHelpOpen(true)}
+          className="p-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-all"
+          title="Help & Guide"
+        >
+          <HelpCircle className="w-5 h-5 text-zinc-400" />
+        </button>
+        <button 
+          onClick={() => setIsSettingsOpen(true)}
+          className="p-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-all"
+          title="Settings"
+        >
+          <Settings className="w-5 h-5 text-zinc-400" />
+        </button>
+      </div>
 
       {/* HUD: Controls */}
       <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col sm:flex-row gap-2 sm:gap-4">
@@ -442,6 +454,114 @@ export default function Home() {
                     Reset Brain (Delete All)
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Help Modal */}
+      <AnimatePresence>
+        {isHelpOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={(e: React.MouseEvent) => e.target === e.currentTarget && setIsHelpOpen(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
+            >
+              <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-linear-to-r from-blue-500/10 to-violet-500/10">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-blue-400" />
+                  <span className="font-bold text-lg">Welcome to SR Mesh</span>
+                </div>
+                <button onClick={() => setIsHelpOpen(false)} className="text-zinc-500 hover:text-white p-1">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-5 space-y-5 overflow-y-auto">
+                {/* What is SR Mesh */}
+                <div>
+                  <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-2">What is SR Mesh?</h3>
+                  <p className="text-zinc-300 text-sm leading-relaxed">
+                    SR Mesh is your personal 3D knowledge graph. Every thought you add becomes a <strong>star</strong> in your galaxy, 
+                    positioned based on its meaning. Similar ideas naturally cluster together, helping you discover connections 
+                    you never knew existed.
+                  </p>
+                </div>
+
+                {/* How to Use */}
+                <div>
+                  <h3 className="text-sm font-bold text-violet-400 uppercase tracking-wider mb-2">How to Use</h3>
+                  <div className="space-y-2 text-sm text-zinc-300">
+                    <p>🌟 <strong>Add Thought</strong> — Click the button at the bottom to capture a new idea</p>
+                    <p>🔍 <strong>Search</strong> — Find thoughts by meaning, not just keywords</p>
+                    <p>👆 <strong>Hover on stars</strong> — See the content and category of each thought</p>
+                    <p>🖱️ <strong>Click on stars</strong> — View, edit, or delete any thought</p>
+                    <p>🔗 <strong>Lines between stars</strong> — Show how related your thoughts are</p>
+                    <p>⌨️ <strong>Press ESC</strong> — Close any modal window</p>
+                  </div>
+                </div>
+
+                {/* Categories */}
+                <div>
+                  <h3 className="text-sm font-bold text-pink-400 uppercase tracking-wider mb-3">Thought Categories</h3>
+                  <p className="text-xs text-zinc-500 mb-3">Each thought is automatically labeled based on its content. The label appears when you hover on a star:</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>❓ Questions</strong> — What, how, why?</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>💡 Insights</strong> — Good, bad, opinions</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>📚 Facts</strong> — Definitions, data</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>🎓 Learning</strong> — Study, courses</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>🛠️ Projects</strong> — Build, develop</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>🧑 Personal</strong> — I feel, my goals</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>💼 Work</strong> — Meetings, deadlines</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>💭 Ideas</strong> — What if, maybe</span>
+                    </div>
+                    <div className="p-2 bg-zinc-800/50 rounded-lg">
+                      <span className="text-zinc-300"><strong>🎨 Creative</strong> — Art, music, writing</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-3 italic">
+                    🎨 Star colors represent semantic clusters — similar thoughts share colors!
+                  </p>
+                </div>
+
+                {/* AI Info */}
+                <div className="p-3 bg-linear-to-r from-blue-500/10 to-violet-500/10 rounded-xl border border-blue-500/20">
+                  <p className="text-xs text-zinc-400 text-center">
+                    🔒 <strong className="text-zinc-300">100% Private</strong> — All AI processing happens in your browser. No data is sent to any server.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-zinc-800 bg-zinc-950/50">
+                <button 
+                  onClick={() => setIsHelpOpen(false)}
+                  className="w-full py-3 bg-linear-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 rounded-xl font-bold text-sm transition-all"
+                >
+                  Got it, let&apos;s go!
+                </button>
               </div>
             </motion.div>
           </motion.div>
