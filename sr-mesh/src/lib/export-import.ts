@@ -1,9 +1,12 @@
-import { getAllNotes, saveNote, searchSimilarNotes } from './db';
+import { getAllNotes, saveNote, searchSimilarNotes, type Note } from './db';
 import { classifyText } from './textClassifier';
 import { kMeansClustering } from './clustering';
-import { safeJsonParse, isExportData, isValidNote, sanitizeNoteContent, isFileSizeValid, type ExportData } from './security';
 
-// ExportData type is now imported from security.ts for validation
+export interface ExportData {
+  version: string;
+  exportedAt: string;
+  notes: Note[];
+}
 
 /**
  * Export all notes to a downloadable JSON file
@@ -35,48 +38,32 @@ export async function exportData(): Promise<void> {
  */
 export async function importData(file: File): Promise<number> {
   return new Promise((resolve, reject) => {
-    // Validate file size first
-    if (!isFileSizeValid(file.size)) {
-      reject(new Error('File too large. Maximum size is 10MB.'));
-      return;
-    }
-
     const reader = new FileReader();
     
     reader.onload = async (e) => {
       try {
         const content = e.target?.result as string;
+        const data: ExportData = JSON.parse(content);
         
-        // Safe parsing with comprehensive validation
-        const data = safeJsonParse<ExportData>(
-          content,
-          isExportData,
-          { version: '', exportedAt: '', notes: [] }
-        );
-
-        // Check if parsing/validation failed
-        if (!data.version || !data.notes.length) {
-          throw new Error('Invalid backup file format or corrupted data');
+        // Validate format
+        if (!data.version || !data.notes || !Array.isArray(data.notes)) {
+          throw new Error('Invalid backup file format');
         }
 
         // Import notes (skip duplicates by ID)
         let imported = 0;
         for (const note of data.notes) {
-          // Extra validation (defense in depth)
-          if (!isValidNote(note)) {
-            console.warn('[Security] Skipping invalid note during import');
-            continue;
+          if (note.id && note.content && note.embedding) {
+            await saveNote({
+              id: note.id,
+              content: note.content,
+              embedding: note.embedding,
+              createdAt: note.createdAt || Date.now(),
+              updatedAt: note.updatedAt,
+              tags: note.tags
+            });
+            imported++;
           }
-
-          // Sanitize content before saving
-          const sanitizedNote = {
-            ...note,
-            content: sanitizeNoteContent(note.content),
-            tags: note.tags?.map(tag => tag.slice(0, 100)) // Limit tag length
-          };
-
-          await saveNote(sanitizedNote);
-          imported++;
         }
         
         resolve(imported);

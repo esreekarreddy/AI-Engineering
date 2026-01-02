@@ -8,7 +8,7 @@ export interface ClusterResult {
   label: string;
 }
 
-// Vibrant cluster colors for 3D visualization
+// Predefined cluster colors (vibrant for 3D visualization)
 const CLUSTER_COLORS = [
   '#3b82f6', // Blue
   '#8b5cf6', // Violet
@@ -20,23 +20,21 @@ const CLUSTER_COLORS = [
   '#ef4444', // Red
 ];
 
+// Labels are now determined dynamically by the textClassifier module
+// based on content analysis rather than cluster position
+
 /**
- * K-means++ clustering for notes based on embedding vectors
- * Groups semantically similar notes together using cosine similarity
- * 
- * @param notes - Array of notes with embeddings
- * @param k - Number of clusters (default: auto-determined)
- * @param maxIterations - Maximum iterations for convergence
- * @returns Map of note ID to cluster result (color + label)
+ * Simple K-means clustering for notes based on embeddings
+ * Uses K-means++ initialization for better centroid selection
  */
 export function kMeansClustering(
   notes: Note[], 
   k: number = 4, 
-  maxIterations: number = 20
+  maxIterations: number = 15
 ): Map<string, ClusterResult> {
   if (notes.length === 0) return new Map();
   
-  // For very few notes, assign distinct clusters directly
+  // For very few notes, assign distinct colors directly
   if (notes.length <= k) {
     const result = new Map<string, ClusterResult>();
     notes.forEach((note, i) => {
@@ -50,58 +48,43 @@ export function kMeansClustering(
   }
 
   const embeddings = notes.map(n => n.embedding);
-  const dim = embeddings[0]?.length || 384;
+  const dim = embeddings[0].length;
 
-  // === K-means++ Initialization ===
-  // Choose initial centroids that are spread apart for better clustering
+  // K-means++ initialization: choose centroids spread apart
   const centroids: number[][] = [];
+  // First centroid: random
+  centroids.push([...embeddings[Math.floor(Math.random() * notes.length)]]);
   
-  // First centroid: random selection
-  const firstIdx = Math.floor(Math.random() * notes.length);
-  centroids.push([...embeddings[firstIdx]]);
-  
-  // Remaining centroids: probability proportional to distance squared
+  // Remaining centroids: choose points far from existing centroids
   while (centroids.length < k) {
     const distances = embeddings.map(emb => {
-      // Find minimum distance to any existing centroid
-      const minDist = Math.min(
-        ...centroids.map(c => 1 - cosineSimilarity(emb, c))
-      );
-      return minDist * minDist; // Square for weighted probability
+      // Min distance to any existing centroid (1 - similarity)
+      const minDist = Math.min(...centroids.map(c => 1 - cosineSimilarity(emb, c)));
+      return minDist * minDist; // Square for probability weighting
     });
     
     const totalDist = distances.reduce((a, b) => a + b, 0);
-    
-    if (totalDist === 0) {
-      // All points are identical, pick random
-      centroids.push([...embeddings[Math.floor(Math.random() * notes.length)]]);
-      continue;
-    }
-    
-    // Weighted random selection
     let random = Math.random() * totalDist;
-    let selected = false;
     
     for (let i = 0; i < distances.length; i++) {
       random -= distances[i];
       if (random <= 0) {
         centroids.push([...embeddings[i]]);
-        selected = true;
         break;
       }
     }
     
-    // Fallback if loop didn't select
-    if (!selected) {
+    // Fallback if loop doesn't pick
+    if (centroids.length < k) {
       centroids.push([...embeddings[Math.floor(Math.random() * notes.length)]]);
     }
   }
 
-  // === K-means Iteration ===
+  // Cluster assignments
   let assignments = new Array(notes.length).fill(0);
 
   for (let iter = 0; iter < maxIterations; iter++) {
-    // Assignment step: assign each point to nearest centroid
+    // Assign each point to nearest centroid
     const newAssignments = embeddings.map(emb => {
       let bestCluster = 0;
       let bestSimilarity = -Infinity;
@@ -118,40 +101,38 @@ export function kMeansClustering(
     });
 
     // Check for convergence
-    const converged = newAssignments.every((a, i) => a === assignments[i]);
-    if (converged) break;
-    
+    if (JSON.stringify(newAssignments) === JSON.stringify(assignments)) {
+      break;
+    }
     assignments = newAssignments;
 
-    // Update step: recalculate centroids as mean of assigned points
+    // Update centroids
     for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
       const clusterPoints = embeddings.filter((_, i) => assignments[i] === clusterIdx);
-      
       if (clusterPoints.length === 0) continue;
       
-      // Calculate mean vector
+      // Average of all points in cluster
       const newCentroid = new Array(dim).fill(0);
       clusterPoints.forEach(point => {
         point.forEach((val, d) => {
           newCentroid[d] += val / clusterPoints.length;
         });
       });
-      
       centroids[clusterIdx] = newCentroid;
     }
   }
 
-  // === Build Result Map ===
-  // K-means determines CLUSTER (color grouping)
-  // textClassifier determines LABEL (semantic meaning)
+  // Build result map with intelligent label classification
   const result = new Map<string, ClusterResult>();
-  
   notes.forEach((note, i) => {
     const clusterId = assignments[i];
     result.set(note.id, {
       clusterId,
       color: CLUSTER_COLORS[clusterId % CLUSTER_COLORS.length],
-      label: classifyText(note.content)  // Intelligent classification for labels
+      // Use content-based classification for accurate labels
+      // K-means clustering provides color grouping (semantic similarity)
+      // Text classifier provides meaningful labels based on content patterns
+      label: classifyText(note.content)
     });
   });
 
@@ -159,14 +140,12 @@ export function kMeansClustering(
 }
 
 /**
- * Determine optimal number of clusters based on dataset size
- * Uses elbow method heuristic for automatic k selection
+ * Determine optimal k - use more clusters for better color variety
  */
 export function determineOptimalK(notesCount: number): number {
   if (notesCount <= 2) return notesCount;
   if (notesCount <= 5) return 3;
   if (notesCount <= 10) return 4;
   if (notesCount <= 20) return 5;
-  if (notesCount <= 50) return 6;
   return Math.min(8, Math.ceil(Math.sqrt(notesCount)));
 }

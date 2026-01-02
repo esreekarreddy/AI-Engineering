@@ -77,10 +77,6 @@ export const getDB = async () => {
  * @param note - The note object to save
  */
 export const saveNote = async (note: Note) => {
-    // Validation - allow empty strings, block undefined/null and overly long content
-    if (note.content === undefined || note.content === null || note.content.length > 20000) {
-        throw new Error('Note content invalid or too long');
-    }
     const db = await getDB();
     await db.put('notes', note);
 };
@@ -129,7 +125,6 @@ export const deleteNote = async (id: string): Promise<void> => {
  * @param embedding - New embedding vector
  */
 export const updateNote = async (id: string, content: string, embedding: number[]): Promise<void> => {
-    if (content === undefined || content === null || content.length > 20000) throw new Error('Content invalid or too long');
     const db = await getDB();
     const existing = await db.get('notes', id);
     if (existing) {
