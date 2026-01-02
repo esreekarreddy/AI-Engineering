@@ -18,6 +18,7 @@ export class WorkerClient {
             const { type, embedding, error } = event.data;
             if (type === 'complete') {
                 this.worker?.removeEventListener('message', handleMessage);
+                console.log(`[SR Mesh] Generated embedding: ${embedding?.length} dims`);
                 resolve(embedding);
             } else if (type === 'error') {
                 this.worker?.removeEventListener('message', handleMessage);

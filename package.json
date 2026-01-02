@@ -1,0 +1,31 @@
+{
+  "name": "ai-engineering",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Engineering Monorepo - Run any app with npm run <appname>",
+  "scripts": {
+    "cortex": "npm run dev --prefix cortex",
+    "mirage": "npm run dev --prefix mirage",
+    "mesh": "npm run dev --prefix sr-mesh",
+    "terminal": "npm run dev --prefix sr-terminal",
+    "nexus": "npm run dev --prefix nexus",
+    "build:cortex": "npm run build --prefix cortex",
+    "build:mirage": "npm run build --prefix mirage",
+    "build:mesh": "npm run build --prefix sr-mesh",
+    "build:terminal": "npm run build --prefix sr-terminal",
+    "build:nexus": "npm run build --prefix nexus",
+    "build:all": "npm run build:cortex && npm run build:mirage && npm run build:mesh && npm run build:terminal",
+    "lint:cortex": "npm run lint --prefix cortex",
+    "lint:mirage": "npm run lint --prefix mirage",
+    "lint:mesh": "npm run lint --prefix sr-mesh",
+    "lint:terminal": "npm run lint --prefix sr-terminal",
+    "lint:all": "npm run lint:cortex && npm run lint:mirage && npm run lint:mesh && npm run lint:terminal"
+  },
+  "keywords": [
+    "ai",
+    "engineering",
+    "ollama",
+    "nextjs"
+  ],
+  "author": "Sreekar Reddy"
+}

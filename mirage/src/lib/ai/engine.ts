@@ -1,5 +1,4 @@
 // Mirage AI Engine - Ollama Cloud Integration
-import { safeJsonParse } from '@/lib/security';
 export type ModelStatus = "idle" | "connecting" | "connected" | "disconnected" | "generating" | "error";
 
 export interface AIState {
@@ -221,14 +220,13 @@ Now analyze the image and generate the React component.`;
               
               for (const line of lines) {
                   try {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const json = safeJsonParse<any>(line, (d): d is any => true, null);
-                      if (json && json.message?.content) {
+                      const json = JSON.parse(line);
+                      if (json?.message?.content) {
                           fullResponse += json.message.content;
                       }
-                      if (json && json.done) break;
+                      if (json?.done) break;
                   } catch {
-                      // Partial JSON
+                      // Partial JSON chunk, skip
                   }
               }
           }
@@ -284,14 +282,13 @@ Now analyze the image and generate the React component.`;
               
               for (const line of lines) {
                   try {
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const json = safeJsonParse<any>(line, (d): d is any => true, null);
-                      if (json && json.message?.content) {
+                      const json = JSON.parse(line);
+                      if (json?.message?.content) {
                           fullResponse += json.message.content;
                       }
-                      if (json && json.done) break;
+                      if (json?.done) break;
                   } catch {
-                      // Partial JSON
+                      // Partial JSON chunk, skip
                   }
               }
           }

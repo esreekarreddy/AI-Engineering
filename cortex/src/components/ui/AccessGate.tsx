@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Lock, Unlock, AlertCircle, X } from 'lucide-react';
-import { ollamaClient } from '@/lib/ollama/client';
+import { ollamaClient, hasAccessCode } from '@/lib/ollama/client';
 
 interface AccessModalProps {
   isOpen: boolean;
@@ -146,7 +146,9 @@ export function AccessModal({ isOpen, onClose, onSuccess }: AccessModalProps) {
 export function useAccessCheck() {
   const isUnlocked = () => {
     if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem('cortex-unlocked') === 'true';
+    // Must have BOTH sessionStorage flag AND actual code in client
+    // Without both, user must re-enter code after page reload
+    return sessionStorage.getItem('cortex-unlocked') === 'true' && hasAccessCode();
   };
   
   return { isUnlocked };

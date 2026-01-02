@@ -221,6 +221,8 @@ export default function Home() {
           setAccessCode(code);
           setAccessError(undefined);
           setShowAccessModal(false);
+          // Initialize AI engine to update connection status
+          await aiEngine.init();
           // Trigger generation after modal closes
           setTimeout(() => handleGenerate(), 100);
       } else {

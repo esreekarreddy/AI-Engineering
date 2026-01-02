@@ -225,10 +225,9 @@ export const useFileStore = create<FileStore>((set, get) => ({
       { files: {}, timestamp: 0 }
     );
 
-    // If validation failed (empty files), clear corrupt data
-    if (Object.keys(project.files).length === 0 && stored.length > 10) {
-      console.warn('[SR Terminal] Corrupt localStorage data detected, clearing');
-      localStorage.removeItem(STORAGE_KEY);
+    // If validation returned fallback (empty files), just return - don't delete data
+    if (Object.keys(project.files).length === 0) {
+      console.log('[SR Terminal] No saved files found or validation returned empty');
       return false;
     }
 

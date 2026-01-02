@@ -124,15 +124,29 @@ export function kMeansClustering(
 
   // Build result map with intelligent label classification
   const result = new Map<string, ClusterResult>();
+  
+  // Category-specific color map
+  const CATEGORY_COLORS: Record<string, string> = {
+    'Questions': '#3b82f6', // Blue
+    'Insights': '#8b5cf6',  // Violet
+    'Ideas': '#ec4899',     // Pink
+    'Learning': '#f97316',  // Orange
+    'Facts': '#22c55e',     // Green
+    'Projects': '#06b6d4',  // Cyan
+    'Personal': '#eab308',  // Yellow
+    'Work': '#ef4444',      // Red
+    'Creative': '#6366f1'   // Indigo
+  };
+
   notes.forEach((note, i) => {
     const clusterId = assignments[i];
+    const category = classifyText(note.content);
+    
     result.set(note.id, {
       clusterId,
-      color: CLUSTER_COLORS[clusterId % CLUSTER_COLORS.length],
-      // Use content-based classification for accurate labels
-      // K-means clustering provides color grouping (semantic similarity)
-      // Text classifier provides meaningful labels based on content patterns
-      label: classifyText(note.content)
+      // Use category-based coloring for semantic clarity
+      color: CATEGORY_COLORS[category] || '#94a3b8', 
+      label: category
     });
   });
 

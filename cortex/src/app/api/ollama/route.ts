@@ -76,12 +76,8 @@ export async function POST(req: Request) {
       return timingSafeCompare(providedCode, serverCode);
     };
 
-    // 1. List available models
+    // 1. List available models (no auth needed - read-only operation)
     if (action === 'list') {
-      if (!verifyAuth(args.code)) {
-         return NextResponse.json({ error: 'Unauthorized', valid: false }, { status: 401 });
-      }
-
       try {
         const res = await fetch(`${OLLAMA_HOST}/api/tags`, { headers });
         if (!res.ok) throw new Error('Ollama Cloud not reachable');

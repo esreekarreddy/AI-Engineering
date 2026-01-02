@@ -14,9 +14,14 @@ export function safeJsonParse<T>(
     
     // Protect against prototype pollution
     if (parsed && typeof parsed === 'object') {
-      if ('__proto__' in parsed || 'constructor' in parsed || 'prototype' in parsed) {
-        console.warn('[Security] Blocked potential prototype pollution attempt');
-        return fallback;
+      // Only check for dangerous keys if they are OWN properties
+      // 'constructor' is on prototype so 'in' check is always true for objects - that was the bug
+      const dangerous = ['__proto__', 'constructor', 'prototype'];
+      for (const dangerousKey of dangerous) {
+        if (Object.prototype.hasOwnProperty.call(parsed, dangerousKey)) {
+          console.warn('[Security] Blocked potential prototype pollution attempt');
+          return fallback;
+        }
       }
     }
     
@@ -45,15 +50,10 @@ export function isStoredProject(data: unknown): data is StoredProject {
   if (typeof obj.timestamp !== 'number') return false;
   if (!obj.files || typeof obj.files !== 'object') return false;
   
-  // Validate all file entries are strings with safe paths
+  // Validate file entries structure - path safety is checked during load
   const files = obj.files as Record<string, unknown>;
-  for (const [path, content] of Object.entries(files)) {
+  for (const [, content] of Object.entries(files)) {
     if (typeof content !== 'string') return false;
-    // Block path traversal attempts
-    if (path.includes('..') || path.startsWith('/')) {
-      console.warn('[Security] Blocked path traversal attempt:', path);
-      return false;
-    }
   }
   
   return true;

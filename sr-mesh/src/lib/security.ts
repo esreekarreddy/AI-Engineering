@@ -16,9 +16,13 @@ export function safeJsonParse<T>(
     
     // Protect against prototype pollution
     if (parsed && typeof parsed === 'object') {
-      if ('__proto__' in parsed || 'constructor' in parsed || 'prototype' in parsed) {
-        console.warn('[Security] Blocked potential prototype pollution attempt');
-        return fallback;
+      // Only check for dangerous keys if they are OWN properties
+      const dangerous = ['__proto__', 'constructor', 'prototype'];
+      for (const dangerousKey of dangerous) {
+        if (Object.prototype.hasOwnProperty.call(parsed, dangerousKey)) {
+          console.warn('[Security] Blocked potential prototype pollution attempt');
+          return fallback;
+        }
       }
     }
     

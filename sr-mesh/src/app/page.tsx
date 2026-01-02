@@ -51,7 +51,7 @@ export default function Home() {
   const refreshMemories = useCallback(async () => {
     const all = await getAllNotes();
     setMemories(all);
-    const e = await calculateEdges(0.6);
+    const e = await calculateEdges(0.5); // Lower threshold to show more connections
     setEdges(e);
   }, []);
 

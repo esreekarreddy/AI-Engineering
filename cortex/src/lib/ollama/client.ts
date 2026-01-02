@@ -28,6 +28,10 @@ class OllamaClient {
 
   private accessCode: string | null = null;
 
+  hasStoredCode(): boolean {
+    return this.accessCode !== null;
+  }
+
   async checkConnection(): Promise<boolean> {
     try {
       const res = await fetch('/api/ollama', {
@@ -137,3 +141,6 @@ class OllamaClient {
 }
 
 export const ollamaClient = OllamaClient.getInstance();
+
+// Export method to check if client actually has access code
+export const hasAccessCode = () => ollamaClient.hasStoredCode();
