@@ -4,16 +4,6 @@ import { pipeline, env, Pipeline } from '@xenova/transformers';
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-// CRITICAL: Set explicit WASM paths for production
-// Without this, ONNX runtime fails to load in serverless/Vercel environments
-(env as Record<string, unknown>).backends = {
-  onnx: {
-    wasm: {
-      wasmPaths: 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/'
-    }
-  }
-};
-
 // Progress callback type for model loading
 interface ProgressInfo {
   status: string;
@@ -46,15 +36,6 @@ self.addEventListener('message', async (event: WorkerMessageEvent) => {
     const { text, type } = event.data;
 
     if (type === 'embed') {
-        // Validate input
-        if (typeof text !== 'string' || text.length > 20000) {
-            self.postMessage({
-                type: 'error',
-                error: 'Input text too long or invalid'
-            });
-            return;
-        }
-
         try {
             const extractor = await EmbeddingPipeline.getInstance((progress: ProgressInfo) => {
                self.postMessage({ type: 'progress', data: progress });
