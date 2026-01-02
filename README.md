@@ -116,6 +116,9 @@ All projects are built with security in mind:
 - **API keys never exposed to client** — Server-side environment variables only
 - **Access code protection** — Prevents unauthorized API usage on live demos
 - **Local-first architecture** — SR Terminal and SR Mesh run entirely client-side
+- **HTTP security headers** — HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- **Input validation** — Prototype pollution protection in `safeJsonParse`, path traversal prevention
+- **HttpOnly cookies** — Mirage uses secure cookie-based auth with 1-hour expiry
 
 ---
 
