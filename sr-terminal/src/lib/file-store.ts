@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { WebContainer } from '@webcontainer/api';
 import { getWebContainerInstance } from './webcontainer';
+import { safeJsonParse, isStoredProject, safeLocalStorageWrite, type StoredProject } from './security';
 
 const STORAGE_KEY = 'sr-terminal-files';
 
@@ -11,10 +12,7 @@ interface FileNode {
   children?: FileNode[];
 }
 
-interface StoredProject {
-  files: Record<string, string>;
-  timestamp: number;
-}
+// StoredProject interface is now imported from security.ts for type-safe validation
 
 interface FileStore {
   fileTree: FileNode[];
@@ -208,19 +206,42 @@ export const useFileStore = create<FileStore>((set, get) => ({
       timestamp: Date.now()
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
-    console.log('[SR Terminal] Project saved to localStorage');
+    const saved = safeLocalStorageWrite(STORAGE_KEY, project);
+    if (saved) {
+      console.log('[SR Terminal] Project saved to localStorage');
+    } else {
+      console.warn('[SR Terminal] Failed to save project to localStorage');
+    }
   },
 
   loadFromLocalStorage: async () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return false;
 
+    // Secure parsing with validation
+    const project = safeJsonParse<StoredProject>(
+      stored,
+      isStoredProject,
+      { files: {}, timestamp: 0 }
+    );
+
+    // If validation failed (empty files), clear corrupt data
+    if (Object.keys(project.files).length === 0 && stored.length > 10) {
+      console.warn('[SR Terminal] Corrupt localStorage data detected, clearing');
+      localStorage.removeItem(STORAGE_KEY);
+      return false;
+    }
+
     try {
-      const project: StoredProject = JSON.parse(stored);
       const webcontainer = await getWebContainerInstance();
 
       for (const [path, content] of Object.entries(project.files)) {
+        // Extra path traversal protection (already in isStoredProject, but defense in depth)
+        if (path.includes('..') || path.startsWith('/')) {
+          console.warn('[SR Terminal] Blocked unsafe path:', path);
+          continue;
+        }
+        
         // Ensure parent directories exist
         const dir = path.split('/').slice(0, -1).join('/');
         if (dir) {

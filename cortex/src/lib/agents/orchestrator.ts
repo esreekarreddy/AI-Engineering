@@ -1,6 +1,7 @@
 // Council Orchestrator - Manages the multi-agent review workflow
 
 import { ollamaClient } from '@/lib/ollama/client';
+import { safeJsonParse } from '@/lib/security';
 import { PROMPTS } from './prompts';
 import { AgentRole, AGENTS, Finding, AgentMessage, CouncilSession } from './types';
 
@@ -118,11 +119,21 @@ export class CouncilOrchestrator {
       const jsonMatch = response.match(/\[[\s\S]*\]/);
       if (!jsonMatch) return [];
       
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = safeJsonParse(jsonMatch[0], (data): data is Partial<Finding>[] => Array.isArray(data), []);
+      
       return parsed.map((f: Partial<Finding>, idx: number) => ({
-        ...f,
         id: `${agentRole.toUpperCase()}-${String(idx + 1).padStart(3, '0')}`,
-        agentRole
+        agentRole,
+        category: f.category || 'bug',
+        severity: f.severity || 'P2',
+        confidence: f.confidence || 0.5,
+        claim: f.claim || 'No claim provided',
+        evidence: f.evidence || 'No evidence provided',
+        impact: f.impact || 'Unknown',
+        fix: f.fix || 'No fix provided',
+        where: f.where || { file: 'unknown' },
+        patchSnippet: f.patchSnippet,
+        tradeoff: f.tradeoff
       }));
     } catch {
       console.error(`Failed to parse findings from ${agentRole}`);

@@ -36,6 +36,15 @@ self.addEventListener('message', async (event: WorkerMessageEvent) => {
     const { text, type } = event.data;
 
     if (type === 'embed') {
+        // Validate input
+        if (typeof text !== 'string' || text.length > 20000) {
+            self.postMessage({
+                type: 'error',
+                error: 'Input text too long or invalid'
+            });
+            return;
+        }
+
         try {
             const extractor = await EmbeddingPipeline.getInstance((progress: ProgressInfo) => {
                self.postMessage({ type: 'progress', data: progress });

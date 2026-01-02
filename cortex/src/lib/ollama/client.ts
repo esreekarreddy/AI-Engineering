@@ -26,12 +26,17 @@ class OllamaClient {
     return OllamaClient.instance;
   }
 
+  private accessCode: string | null = null;
+
   async checkConnection(): Promise<boolean> {
     try {
       const res = await fetch('/api/ollama', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'list' })
+        body: JSON.stringify({ 
+          action: 'list',
+          code: this.accessCode // Send access code
+        })
       });
       
       if (!res.ok) {
@@ -58,7 +63,11 @@ class OllamaClient {
       if (!res.ok) return false;
       
       const data = await res.json();
-      return data.valid === true;
+      if (data.valid === true) {
+        this.accessCode = code; // Store verified code
+        return true;
+      }
+      return false;
     } catch {
       return false;
     }
@@ -72,6 +81,7 @@ class OllamaClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'chat',
+        code: this.accessCode, // Send access code
         model,
         messages,
         stream,
@@ -80,6 +90,9 @@ class OllamaClient {
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error('Unauthorized or invalid access code.');
+      }
       if (res.status === 429) {
         throw new Error('Rate limit exceeded. Try again later.');
       }
@@ -100,6 +113,10 @@ class OllamaClient {
 
         for (const line of lines) {
           try {
+            // Basic prototype pollution check before full parse
+            if (line.includes('__proto__') || line.includes('constructor')) {
+              continue; 
+            }
             const json = JSON.parse(line);
             if (json.message?.content) {
               fullResponse += json.message.content;

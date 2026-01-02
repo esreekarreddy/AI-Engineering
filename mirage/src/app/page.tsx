@@ -35,26 +35,18 @@ export default function Home() {
   const [accessCode, setAccessCode] = useState<string | null>(null);
   const [accessError, setAccessError] = useState<string | undefined>();
 
-  // Load access code from localStorage on mount (with 1-hour expiry)
+  // Check for active session on mount
   useEffect(() => {
-      const savedData = localStorage.getItem('mirage_access');
-      if (savedData) {
-          try {
-              const { code, timestamp } = JSON.parse(savedData);
-              const ONE_HOUR = 60 * 60 * 1000; // 1 hour in ms
-              const isExpired = Date.now() - timestamp > ONE_HOUR;
-              
-              if (isExpired) {
-                  localStorage.removeItem('mirage_access');
-                  setAccessCode(null);
-              } else {
-                  setAccessCode(code);
-              }
-          } catch {
-              localStorage.removeItem('mirage_access');
-          }
-      }
-  }, []);
+    const check = async () => {
+        const isValid = await aiEngine.checkSession();
+        if (isValid) {
+            setAccessCode('SESSION_ACTIVE'); // Dummy value to indicate logged in
+        } else {
+            setAccessCode(null);
+        }
+    };
+    check();
+  },[]);
 
   const addLog = (msg: string) => {
       // Strip ANSI codes and terminal noise
@@ -208,7 +200,6 @@ export default function Home() {
         
         // Check if this is an auth error
         if (errorMessage.includes('Invalid access code')) {
-            localStorage.removeItem('mirage_access');
             setAccessCode(null);
             setAccessError('Invalid access code. Please try again.');
             setShowAccessModal(true);
@@ -228,11 +219,6 @@ export default function Home() {
       const isValid = await aiEngine.verifyAccessCode(code);
       if (isValid) {
           setAccessCode(code);
-          // Save with timestamp for 1-hour expiry
-          localStorage.setItem('mirage_access', JSON.stringify({
-              code,
-              timestamp: Date.now()
-          }));
           setAccessError(undefined);
           setShowAccessModal(false);
           // Trigger generation after modal closes
